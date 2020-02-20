@@ -1,2 +1,5 @@
 Sources:
 Graph implementation: https://www.python-course.eu/graphs_python.php
+Agglomerative hierarchical clustering: https://www.datanovia.com/en/lessons/agglomerative-hierarchical-clustering/
+
+Birdcatcher image: https://www.mercurynews.com/2018/07/09/where-birds-and-limes-go-after-dark-the-race-to-charge-bay-areas-scooters/

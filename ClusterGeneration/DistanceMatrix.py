@@ -1,5 +1,45 @@
+from Graphing.GraphConstructor import Graph as G
 import math
 import random
+import heapq as hq
+
+Inf = float("Inf")
+def Dijkstra(G, s):
+    vertices = G.vertices()
+    visited = dict()
+    dist = dict()
+    Q = [(0.0, s)]
+
+    for v in vertices:
+        visited[v] = False
+        dist[v] = Inf
+
+    while Q:
+        (length, node) = hq.heappop(Q)
+        visited[node] = True
+        dist[node] = length
+
+        neighbors = G.get_neighbors(node)
+        for n in neighbors:
+            if not visited[n]:
+                weight = G.get_edgeweight(node, n)
+                if weight != -1:
+                    if dist[n] > dist[node] + weight:
+                        dist[n] = dist[node] + weight
+                        hq.heappush(Q, (dist[n], n))
+
+    return dist
+
+
+def generateDistanceMatrix(graph):
+    vertices = graph.vertices()
+    sizeOfGraph = len(vertices)
+    matrix = dict()
+    for v in vertices:
+        matrix[v] = [Inf for w in vertices]
+    for k in matrix.keys():
+        matrix[k] = Dijkstra(graph, k)
+    return matrix
 
 
 # Generates a simple random distance matrix from input of dimensions of the plane and the number of elements
