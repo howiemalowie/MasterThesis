@@ -14,6 +14,7 @@ def generatePOI(graph, amount, onSameNode=True):
                         w = graph.get_nodeweight(v)+1
                         graph.set_nodeweight(v, w)
                         amount -= 1
+                        print(amount)
                         if amount == 0:
                             done = True
                             break
@@ -38,3 +39,11 @@ def generatePOI(graph, amount, onSameNode=True):
                                 done = True
                                 break
     return graph
+
+def removeEmptyNodes(graph, revGraph=None):
+    if not revGraph is None:
+        for v in graph.vertices():
+            if graph.get_nodeweight(v) == 0:
+                graph.remove_vertex(v, contract=True)
+                revGraph.remove_vertex(v, contract=True)
+    return graph, revGraph

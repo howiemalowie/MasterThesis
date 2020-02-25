@@ -22,21 +22,29 @@ class Graph(object):
 
     def edges(self):
         """ returns the edges of a graph """
-        return list(self.__graph_dict.values())
+        lst = list()
+        for edges in self.__graph_dict.values():
+            for e in edges:
+                lst.append(e)
+        return lst
 
     def coords(self):
+        """ returns the vertex info of a graph """
         return list(self.__coord_dict.values())
 
     def get_nodeweight(self, vertex):
+        """ returns the weight of given vertex """
         [_, _, weight] = self.__coord_dict[vertex]
         return weight
 
     def set_nodeweight(self, vertex, weight):
+        """ sets the weight of given node """
         [x, y, _] = self.__coord_dict[vertex]
         self.__coord_dict[vertex] = [x, y, weight]
 
-    # NEED TO OPTIMIZE THIS
+    # NEED TO OPTIMIZE THIS (O(m) runtime)
     def get_edgeweight(self, v, u):
+        """ returns the weight of given edge """
         edges = self.__graph_dict[v]
         for e in edges:
             if e[1] == u:
@@ -44,6 +52,7 @@ class Graph(object):
         return -1
 
     def get_neighbors(self, vertex):
+        """ returns neighbor set of given vertex """
         neighbors = list()
         for edge in self.__graph_dict[vertex]:
             neighbors.append(edge[1])
@@ -82,15 +91,43 @@ class Graph(object):
             self.__coord_dict[vertex] = []
         self.__coord_dict[vertex] = coord
 
-    def remove_vertex(self, vertex):
+    # NEED TO OPTIMIZE (O(n) runtime when contracting)
+    def remove_vertex(self, vertex, contract=False):
+        if contract:
+            edges = self.__graph_dict[vertex]
+            outV = list()
+            inV = list()
+            lengthout = list()
+            lengthin = list()
+            for e in edges:
+                inV.append(e[1])
+                lengthin.append(e[2])
+
+            edges = self.edges()
+            for e in edges:
+                print(e)
+                if e[1] == vertex:
+                    outV.append(e[0])
+                    self.remove_edge(e[0], e)
+                    lengthout.append(e[2])
+
+            for o in range(len(outV)):
+                for i in range(len(inV)):
+                    print("adding edge between", outV[o], "and", inV[i])
+                    self.add_edge(outV[o], [outV[o], inV[i], lengthin[i] + lengthout[o]])
+
+        # Remove vertex from graph
         if vertex in self.__graph_dict:
             del self.__graph_dict[vertex]
         if vertex in self.__coord_dict:
             del self.__coord_dict[vertex]
 
     def remove_edge(self, vertex, edge):
+        # Removes the edge of given vertex
         if vertex in self.__graph_dict:
-            self.__graph_dict[vertex].remove(edge)
+            if edge in self.edges():
+                print("removing edge:", edge, "from vertex:", vertex)
+                self.__graph_dict[vertex].remove(edge)
 
 
     def __str__(self):

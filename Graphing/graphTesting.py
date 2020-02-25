@@ -1,6 +1,6 @@
 from ClusterGeneration.DistanceMatrix import generateDistanceMatrix
-from Graphing.ConnectGraph import connectGraph
-from Graphing.GeneratePOI import generatePOI
+from Graphing.ConnectGraph import *
+from Graphing.GeneratePOI import *
 from Graphing.GraphConstructor import Graph
 
 def constructGraph(nodeFile, edgeFile, directed=True):
@@ -32,10 +32,7 @@ def constructGraph(nodeFile, edgeFile, directed=True):
             graph.add_edge(int(outNode), [int(outNode), int(inNode), length])
             revGraph.add_edge(int(inNode), [int(inNode), int(outNode), length])
 
-        graph = generatePOI(graph, int(len(graph.vertices()) / 2), False)
-        graph = connectGraph(graph, revGraph)
-
-        return graph
+        return graph, revGraph
 
     else:
         for v in vertices:
@@ -58,8 +55,14 @@ if __name__ == "__main__":
     file1 = "C:/Users/havar/Documents/MasterThesis/cycle.cnode"
     file2 = "C:/Users/havar/Documents/MasterThesis/cycle.cedge"
     directed = True
-    graph = constructGraph(file1, file2, directed)
+    graph, revGraph = constructGraph(file1, file2, directed)
     print(graph.__str__())
+    graph = generatePOI(graph, 2, True)
+    print(graph.__str__())
+    graph, revGraph = removeEmptyNodes(graph, revGraph)
+    print(graph.__str__())
+    graph = connectGraph(graph, revGraph)
+
     distMatrix = generateDistanceMatrix(graph)
     for i in distMatrix.keys():
         print(distMatrix[i])

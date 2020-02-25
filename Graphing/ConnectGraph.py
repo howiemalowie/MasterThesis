@@ -53,8 +53,6 @@ def connectGraph(graph, revGraph=None):
                     if thisVisit[ele] and revThisVisit[ele]:
                         componentSize += 1
 
-                print("Size of cc:", componentSize)
-                print("Size of largest", largestComponent)
                 if componentSize > largestComponent:
                     largestComponent = componentSize
                     largestStart = v
@@ -65,7 +63,6 @@ def connectGraph(graph, revGraph=None):
         keepNodes = DFS(graph, largestStart, visited, thisVisit)
         revKeepNodes = DFS(revGraph, largestStart, visited, revThisVisit)
         removedNodes = 0
-        print("Largest CC:", largestComponent)
         for v in graph.vertices():
             # Remove vertex
             if not keepNodes[v] or not revKeepNodes[v]:
