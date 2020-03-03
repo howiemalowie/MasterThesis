@@ -11,6 +11,7 @@ def Dijkstra(G, s):
     Q = [(0.0, s)]
 
     for v in vertices:
+        #print(v)
         visited[v] = False
         dist[v] = Inf
 

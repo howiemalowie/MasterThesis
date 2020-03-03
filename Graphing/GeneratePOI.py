@@ -14,7 +14,7 @@ def generatePOI(graph, amount, onSameNode=True):
                         w = graph.get_nodeweight(v)+1
                         graph.set_nodeweight(v, w)
                         amount -= 1
-                        print(amount)
+                        #print(amount)
                         if amount == 0:
                             done = True
                             break
