@@ -10,20 +10,21 @@ def generatePOI(graph, amount, onSameNode=True):
                 rand = graph.vertices()
                 random.shuffle(rand)
                 for v in rand:
-                    if random.random() <= prob:
-                        w = graph.get_nodeweight(v)+1
-                        graph.set_nodeweight(v, w)
-                        amount -= 1
-                        #print(amount)
-                        if amount == 0:
-                            done = True
-                            break
-                        prob = amount / len(graph.vertices())
+                    if v != graph.get_base():
+                        if random.random() <= prob:
+                            w = graph.get_nodeweight(v)+1
+                            graph.set_nodeweight(v, w)
+                            amount -= 1
+                            if amount == 0:
+                                done = True
+                                break
+                            prob = amount / len(graph.vertices())
 
     else:
         if prob > 1:
             for v in graph.vertices():
-                graph.set_nodeweight(v, 1)
+                if v != graph.get_base():
+                    graph.set_nodeweight(v, 1)
         else:
             while not done:
                 rand = graph.vertices()
@@ -32,14 +33,16 @@ def generatePOI(graph, amount, onSameNode=True):
                     if graph.get_nodeweight(v) > 0:
                         continue
                     else:
-                        if random.random() <= prob:
-                            graph.set_nodeweight(v, 1)
-                            amount -= 1
-                            if amount == 0:
-                                done = True
-                                break
+                        if v != graph.get_base():
+                            if random.random() <= prob:
+                                graph.set_nodeweight(v, 1)
+                                amount -= 1
+                                if amount == 0:
+                                    done = True
+                                    break
     return graph
 
+"""
 def removeEmptyNodes(graph, revGraph=None):
     if not revGraph is None:
         for v in graph.vertices():
@@ -47,3 +50,4 @@ def removeEmptyNodes(graph, revGraph=None):
                 graph.remove_vertex(v, contract=True)
                 revGraph.remove_vertex(v, contract=True)
     return graph, revGraph
+"""

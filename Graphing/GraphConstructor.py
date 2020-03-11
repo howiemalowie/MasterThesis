@@ -1,7 +1,7 @@
 
 class Graph(object):
 
-    def __init__(self, graph_dict=None, coord_dict=None):
+    def __init__(self, graph_dict=None, coord_dict=None, base_vertex=None):
         """ initializes a graph object
             If no dictionary or None is given,
             an empty dictionary will be used
@@ -10,8 +10,11 @@ class Graph(object):
             graph_dict = {}
         if coord_dict is None:
             coord_dict = {}
+        if base_vertex is None:
+            base_vertex = 'B'
         self.__graph_dict = graph_dict
         self.__coord_dict = coord_dict
+        self.__base_vertex = base_vertex
 
     def vertices(self):
         """ returns the vertices of a graph """
@@ -20,9 +23,9 @@ class Graph(object):
     def edges(self):
         """ returns the edges of a graph """
         lst = list()
-        for edges in self.__graph_dict.values():
-            for e in edges:
-                lst.append(e)
+        for v in self.vertices():
+            for edge in self.__graph_dict[v]:
+                lst.append((v, edge, self.get_edgeweight(v, edge)))
         return lst
 
     def coords(self):
@@ -43,17 +46,17 @@ class Graph(object):
     def get_edgeweight(self, v, u):
         """ returns the weight of given edge """
         edges = self.__graph_dict[v]
-        for e in edges:
-            if e[1] == u:
-                return e[2]
-        return -1
+        return edges[u]
 
     def get_neighbors(self, vertex):
         """ returns neighbor set of given vertex """
-        neighbors = list()
-        for edge in self.__graph_dict[vertex]:
-            neighbors.append(edge[1])
-        return neighbors
+        return self.__graph_dict[vertex].keys()
+
+    def set_base(self, vertex):
+        self.__base_vertex = vertex
+
+    def get_base(self):
+        return self.__base_vertex
 
     def add_vertex(self, vertex):
         """ If the vertex "vertex" is not in
@@ -62,20 +65,20 @@ class Graph(object):
             Otherwise nothing has to be done.
         """
         if vertex not in self.__graph_dict:
-            self.__graph_dict[vertex] = []
+            self.__graph_dict[vertex] = dict()
         if vertex not in self.__coord_dict:
             self.__coord_dict[vertex] = []
 
-    """ edge datatype:  [outgoing vertex, inbound vertex, weight]"""
-    def add_edge(self, vertex, edge):
-        """ assumes that edge is of type set, tuple or list;
+    """ edge datatype:  {inGoing edge: edgeWeight}"""
+    def add_edge(self, vertex1, vertex2, weight):
+        """ assumes that edge is of type dict;
             between two vertices can be multiple edges!
         """
-        if vertex in self.__graph_dict:
-            self.__graph_dict[vertex].append(edge)
+        if vertex1 in self.__graph_dict:
+            self.__graph_dict[vertex1][vertex2] = weight
         else:
-            self.add_vertex(vertex)
-            self.__graph_dict[vertex].append(edge)
+            self.add_vertex(vertex1)
+            self.__graph_dict[vertex1] = {vertex2: weight}
 
     """ coord dataType: [X-coordinate, Y-coordinate, nodeWeight]"""
     def add_coords(self, vertex, coord):
@@ -85,13 +88,14 @@ class Graph(object):
         coord_dict
         """
         if vertex not in self.__graph_dict:
-            self.__graph_dict[vertex] = []
+            self.__graph_dict[vertex] = dict()
         if vertex not in self.__coord_dict:
             self.__coord_dict[vertex] = []
         self.__coord_dict[vertex] = coord
 
-    # NEED TO OPTIMIZE (O(n) runtime when contracting)
-    def remove_vertex(self, vertex, contract=False):
+    # NEED TO OPTIMIZE (O(n) runtime when contracting), not sure if contraction operation is needed
+    def remove_vertex(self, vertex):
+        """
         if contract:
             edges = self.__graph_dict[vertex]
             outV = list()
@@ -113,8 +117,14 @@ class Graph(object):
                 for i in range(len(inV)):
                     self.add_edge(outV[o], [outV[o], inV[i], lengthin[i] + lengthout[o]])
 
+        """
+        # Remove all edges to vertex
+        for v in self.vertices():
+            self.__graph_dict[v].pop(vertex, None)
+
         # Remove vertex from graph
         if vertex in self.__graph_dict:
+            self.__graph_dict.pop('key', None)
             del self.__graph_dict[vertex]
         if vertex in self.__coord_dict:
             del self.__coord_dict[vertex]
@@ -141,28 +151,29 @@ class Graph(object):
                     newVertex += alphabet[myOrder % 26]
                     myOrder -= 26
                 newVertices.append(newVertex)
+                newVertices.append(newVertex)
                 order += 1
                 dupes -= 1
 
                 # Add new vertex to graph with same data as original vertex
                 self.add_vertex(newVertex)
                 self.add_coords(newVertex, nodeData)
-                for [outV, inV, w] in edgeData:
-                    self.add_edge(newVertex, [newVertex, inV, w])
+                for e in edgeData:
+                    self.add_edge(newVertex, e, edgeData[e])
 
                 # Add edge to new vertex for all vertices with edge to original vertex
-                edges = self.edges()
-                for [outV, inV, w] in edges:
-                    if inV == vertex:
-                        self.add_edge(outV, [outV, newVertex, w])
+                vertices = self.vertices()
+                for v in vertices:
+                    if vertex in self.__graph_dict[v]:
+                        self.add_edge(v, newVertex, self.get_edgeweight(v, vertex))
 
             # Add edge between all duplicated nodes, with edgeweight 0
             for n in newVertices:
-                self.add_edge(vertex, [vertex, n, 0.0])
-                self.add_edge(n, [n, vertex, 0.0])
+                self.add_edge(vertex, n, 0.0)
+                self.add_edge(n, vertex, 0.0)
                 for m in newVertices:
                     if m != n:
-                        self.add_edge(n, [n, m, 0.0])
+                        self.add_edge(n, m, 0.0)
 
     def __str__(self):
         res = "vertices: "
