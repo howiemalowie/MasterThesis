@@ -34,9 +34,11 @@ def solveTrips(dists, tripLimit):
     visited = dict.fromkeys(dists, False)
     visited[B] = True
 
-    # Sort each row in matrix based on distance
+    # Sort each row in matrix based on distance (matrix already sorted)
+    """
     for d in dists.keys():
         dists[d] = {k: v for k, v in sorted(dists[d].items(), key=lambda item: item[1])}
+    """
 
     trips = list()
     triplengths = list()

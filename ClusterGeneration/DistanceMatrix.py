@@ -4,14 +4,16 @@ import random
 import heapq as hq
 
 Inf = float("Inf")
+
+
 def Dijkstra(G, s):
     b = G.get_base()
     vertices = G.vertices()
     visited = dict()
     dist = dict()
+    sortedDist = dict()
     finalDist = dict.fromkeys([w for w in vertices if G.get_nodeweight(w) > 0 or w == b])
     Q = [(0.0, s)]
-
 
     for v in vertices:
         visited[v] = False
@@ -24,6 +26,7 @@ def Dijkstra(G, s):
 
         if G.get_nodeweight(node) > 0 or node == b:
             finalDist[node] = dist[node]
+            sortedDist[node] = dist[node]
 
         neighbors = G.get_neighbors(node)
         for n in neighbors:
@@ -34,20 +37,21 @@ def Dijkstra(G, s):
                         dist[n] = dist[node] + weight
                         hq.heappush(Q, (dist[n], n))
 
-    return finalDist
+    return sortedDist, finalDist
 
 
 def generateDistanceMatrix(graph):
     vertices = graph.vertices()
     matrix = dict()
+    sortedMatrix = dict()
     b = graph.get_base()
     for v in vertices:
         if graph.get_nodeweight(v) > 0 or v == b:
-            matrix[v] = [Inf for w in vertices if graph.get_nodeweight(v) > 0 or v == b]
-    for k in matrix.keys():
-        if graph.get_nodeweight(k) > 0 or k == b:
-            matrix[k] = Dijkstra(graph, k)
-    return matrix
+            sortedDist, finalDist = Dijkstra(graph, v)
+            sortedMatrix[v] = sortedDist
+            matrix[v] = finalDist
+
+    return matrix, sortedMatrix
 
 
 # Generates a simple random distance matrix from input of dimensions of the plane and the number of elements

@@ -1,4 +1,5 @@
 from ClusterGeneration.DistanceMatrix import generateDistanceMatrix
+from ClusterGeneration.GreedySolver import solveTrips
 from Graphing.ConnectGraph import *
 from Graphing.GeneratePOI import *
 from Graphing.GraphConstructor import Graph
@@ -74,22 +75,43 @@ def constructGraph(nodeFile, edgeFile, directed=True):
     return graph
 
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
+def main_test():
     file1 = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cnode"
     file2 = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cedge"
+    tripLimit = 8
     directed = False
     Origgraph = constructGraph(file1, file2, directed)
     size = len(Origgraph.vertices())
-    graphWithPOI = generatePOI(Origgraph, int(size/10), True)
-    graphSplitNodes = duplicatePluralWeightedNodes(graphWithPOI)
-    connectedGraph = connectGraph(graphSplitNodes, directed)
+    graphWithPOI = generatePOI(Origgraph, int(size/20), True)
+    connectedGraph = connectGraph(graphWithPOI, directed)
+    graphSplitNodes = duplicatePluralWeightedNodes(connectedGraph)
+    distMatrix, sortedDistMatrix = generateDistanceMatrix(connectedGraph)
+    return sortedDistMatrix, tripLimit
+    #Output formatting
+    """
+    print("Input:")
+    print("maximum trip:", 8)
+    
+    for i in sortedDistMatrix.keys():
+        print(i, end=': ')
+        for j in sortedDistMatrix[i].keys():
+                print(j, ": {0:.2f}".format(round(sortedDistMatrix[i][j], 3)), end = ', ')
+        print()
+    print()
 
-    distMatrix = generateDistanceMatrix(connectedGraph)
     for i in distMatrix.keys():
         print(i, end=': ')
         for j in distMatrix[i].keys():
                 print(j, ": {0:.2f}".format(round(distMatrix[i][j], 3)), end = ', ')
         print()
+    print()
+    print("Output:")
+    lengths, trips = solveTrips(sortedDistMatrix, 8)
+    print("total Distance:", round(sum(lengths), 3))
+    for i, r in enumerate(trips):
+        print("trip", i, "|", "length:", round(lengths[i], 3), r)
+    """
 
 
 
