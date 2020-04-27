@@ -79,15 +79,15 @@ def constructGraph(nodeFile, edgeFile, directed=True):
 def main_test():
     file1 = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cnode"
     file2 = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cedge"
-    tripLimit = 8
+    tripLimit = 3
     directed = False
     Origgraph = constructGraph(file1, file2, directed)
     size = len(Origgraph.vertices())
     graphWithPOI = generatePOI(Origgraph, int(size/20), True)
     connectedGraph = connectGraph(graphWithPOI, directed)
     graphSplitNodes = duplicatePluralWeightedNodes(connectedGraph)
-    distMatrix, sortedDistMatrix = generateDistanceMatrix(connectedGraph)
-    return sortedDistMatrix, tripLimit
+    distMatrix, sortedDistMatrix = generateDistanceMatrix(graphSplitNodes)
+    return sortedDistMatrix, tripLimit, graphSplitNodes.get_base()
     #Output formatting
     """
     print("Input:")
