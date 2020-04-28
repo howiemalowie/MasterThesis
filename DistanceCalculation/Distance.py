@@ -1,8 +1,7 @@
-from ClusterGeneration.Clustering import Cluster
+from ClusterGeneration.Clustering import *
 
 
 def complete_linkage_clustering(cluster1, cluster2, matrix):
-    #TODO: implement complete
     elems1 = cluster1.get_elements()
     elems2 = cluster2.get_elements()
     max_dist = 0
@@ -14,7 +13,6 @@ def complete_linkage_clustering(cluster1, cluster2, matrix):
 
 
 def single_linkage_clustering(cluster1, cluster2, matrix):
-    #TODO: implement single
     elems1 = cluster1.get_elements()
     elems2 = cluster2.get_elements()
     min_dist = float("Inf")
@@ -26,7 +24,6 @@ def single_linkage_clustering(cluster1, cluster2, matrix):
 
 
 def avg_linkage_clustering(cluster1, cluster2, matrix):
-    #TODO: implement average
     elems1 = cluster1.get_elements()
     elems2 = cluster2.get_elements()
     cluster_size = len(elems1) + len(elems2)

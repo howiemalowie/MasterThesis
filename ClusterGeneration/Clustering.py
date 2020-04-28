@@ -1,4 +1,6 @@
 import heapq
+from DistanceCalculation.Distance import *
+
 
 class ClusterGroup(object):
     """
@@ -13,7 +15,7 @@ class ClusterGroup(object):
         self.__cluster_list = cluster_list
         self.__OG_matrix = matrix
         self.__cluster_limit = cluster_limit
-        self.__cluster_matrix, self.__priority_queue = self.calc_average_cluster_matrix()
+        self.__priority_queue = self.calc_average_cluster_matrix()
 
     def get_all_clusters(self):
         return self.__cluster_list
@@ -33,70 +35,46 @@ class ClusterGroup(object):
     def get_OG_matrix(self):
         return self.__OG_matrix
 
-    def get_cluster_matrix(self):
-        return self.__cluster_matrix
-
     def get_priority_queue(self):
         return self.__priority_queue
 
     def calc_average_cluster_matrix(self):
-        clusterMatrix = dict()
         PQ = list()
         clusters = self.get_all_clusters()
+        limit = self.get_cluster_limit()
         for (c1ID, c1) in clusters.items():
-            clusterRow = dict()
             for (c2ID, c2) in clusters.items():
-                if c1ID != c2ID and c1.get_cluster_size() + c2.get_cluster_size() <= self.__cluster_limit:
-                    res = self.get_cluster_distance(c1, c2)
-                    clusterRow[c2.get_clusterID()] = res
+                if c1ID != c2ID and c1.get_cluster_size() + c2.get_cluster_size() <= limit:
+                    res = avg_linkage_clustering(c1, c2, self.get_OG_matrix())
                     heapq.heappush(PQ, (res, c1ID, c2ID))
-                    clusterMatrix[c1.get_clusterID()] = clusterRow
-        return clusterMatrix, PQ
+        return PQ
 
     def merge_clusters(self, cluster1, cluster2):
         clusterID1 = cluster1.get_clusterID()
         clusterID2 = cluster2.get_clusterID()
         clusters = self.get_all_clusters()
-        newDict = dict()
         newCluster = self.get_merged_clusters(cluster1, cluster2)
         newID = newCluster.get_clusterID()
-        newDict[newID] = 0
 
-        self.add_cluster(newCluster)
-        self.__cluster_matrix[newID] = newDict
-        self.__cluster_matrix.pop(clusterID1, None)
-        self.__cluster_matrix.pop(clusterID2, None)
         self.remove_cluster(clusterID1)
         self.remove_cluster(clusterID2)
 
         # Update matrix
         for cID, c in clusters.items():
             if newCluster.get_cluster_size() + c.get_cluster_size() <= self.__cluster_limit:
-                newDist = self.get_cluster_distance(newCluster, c)
-                self.__cluster_matrix[cID][newID] = newDist
-                self.__cluster_matrix[cID].pop(clusterID1, None)
-                self.__cluster_matrix[cID].pop(clusterID2, None)
-                self.__cluster_matrix[newID][cID] = newDist
+                newDist = avg_linkage_clustering(newCluster, c, self.get_OG_matrix())
                 heapq.heappush(self.__priority_queue, (newDist, cID, newID))
 
-    def get_cluster_distance(self, cluster1, cluster2):
-        matrix = self.get_OG_matrix()
-        avg = 0
-        cnt = 0
-        for e1 in cluster1.get_elements():
-            for e2 in cluster2.get_elements():
-                avg += (matrix[e1][e2] * matrix[e2][e1]) / 2
-                cnt += 1
-        return avg / cnt
+        self.add_cluster(newCluster)
 
-    def get_merged_clusters(self, c1, c2):
+    @staticmethod
+    def get_merged_clusters(c1, c2):
         ID1 = c1.get_clusterID()
         ID2 = c2.get_clusterID()
         ele1 = c1.get_elements()
         ele2 = c2.get_elements()
         newList = ele1 + list(set(ele2) - set(ele1))
         newID = ID1 + ", " + ID2
-
         newCluster = Cluster(newID, newList)
         return newCluster
 
