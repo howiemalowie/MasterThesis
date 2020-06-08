@@ -1,4 +1,3 @@
-from ClusterGeneration.Clustering import *
 
 
 def complete_linkage_clustering(cluster1, cluster2, matrix):

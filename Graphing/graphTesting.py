@@ -1,8 +1,9 @@
-from ClusterGeneration.DistanceMatrix import generateDistanceMatrix
-from ClusterGeneration.GreedySolver import solveTrips
+from DistanceCalculation.DistanceMatrix import generateDistanceMatrix
 from Graphing.ConnectGraph import *
 from Graphing.GeneratePOI import *
 from Graphing.GraphConstructor import Graph
+
+import matplotlib.pyplot as plt
 
 
 def duplicatePluralWeightedNodes(graph, revGraph=None):
@@ -75,19 +76,46 @@ def constructGraph(nodeFile, edgeFile, directed=True):
     return graph
 
 
-#if __name__ == "__main__":
+def scatter_plot(graph, distMatrix):
+
+    coords = graph.get_coord_dict()
+    X = list()
+    Y = list()
+
+    for k in distMatrix.keys():
+        [lon, lat, _] = coords[k]
+        X.append(lon)
+        Y.append(lat)
+
+    Xmap = list()
+    Ymap = list()
+    for [lon, lat, _] in coords.values():
+        Xmap.append(lon)
+        Ymap.append(lat)
+
+    plt.scatter(Xmap, Ymap, label="Road", color="green", marker=".", s=10)
+    plt.scatter(X, Y, label="POI", color="red", marker="*", s=30)
+
+    plt.xlabel('latitude')
+    plt.ylabel('longitude')
+    plt.title('Map of Greater Los Angeles')
+    plt.legend()
+
+    plt.show()
+
 def main_test():
     file1 = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cnode"
     file2 = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cedge"
-    tripLimit = 3
+    tripLimit = 5
     directed = False
-    Origgraph = constructGraph(file1, file2, directed)
-    size = len(Origgraph.vertices())
-    graphWithPOI = generatePOI(Origgraph, int(size/20), True)
-    connectedGraph = connectGraph(graphWithPOI, directed)
-    graphSplitNodes = duplicatePluralWeightedNodes(connectedGraph)
-    distMatrix, sortedDistMatrix = generateDistanceMatrix(graphSplitNodes)
-    return sortedDistMatrix, tripLimit, graphSplitNodes.get_base()
+    graph = constructGraph(file1, file2, directed)
+    size = len(graph.vertices())
+    graph = generatePOI(graph, int(20), True)
+    graph = connectGraph(graph, directed)
+    graph = duplicatePluralWeightedNodes(graph)
+    distMatrix, sortedDistMatrix = generateDistanceMatrix(graph)
+    #scatter_plot(graph, distMatrix)
+    return sortedDistMatrix, tripLimit, graph.get_base()
     #Output formatting
     """
     print("Input:")

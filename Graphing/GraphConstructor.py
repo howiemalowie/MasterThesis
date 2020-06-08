@@ -4,7 +4,7 @@ class Graph(object):
     def __init__(self, graph_dict=None, coord_dict=None, base_vertex=None):
         """ initializes a graph object
             If no dictionary or None is given,
-            an empty dictionary will be used
+            an empty dictionary will be created
         """
         if graph_dict is None:
             graph_dict = {}
@@ -32,6 +32,10 @@ class Graph(object):
         """ returns the vertex info of a graph """
         return list(self.__coord_dict.values())
 
+    def get_coord_dict(self):
+        """ returns the dictionary of vertex info of a graph"""
+        return self.__coord_dict
+
     def get_nodeweight(self, vertex):
         """ returns the weight of given vertex """
         [_, _, weight] = self.__coord_dict[vertex]
@@ -42,7 +46,6 @@ class Graph(object):
         [x, y, _] = self.__coord_dict[vertex]
         self.__coord_dict[vertex] = [x, y, weight]
 
-    # NEED TO OPTIMIZE THIS (O(m) runtime)
     def get_edgeweight(self, v, u):
         """ returns the weight of given edge """
         edges = self.__graph_dict[v]
@@ -53,9 +56,11 @@ class Graph(object):
         return self.__graph_dict[vertex].keys()
 
     def set_base(self, vertex):
+        """ sets the given vertex as the base vertex of the graph"""
         self.__base_vertex = vertex
 
     def get_base(self):
+        """ returns the base vertex of the graph"""
         return self.__base_vertex
 
     def add_vertex(self, vertex):
@@ -124,7 +129,6 @@ class Graph(object):
 
         # Remove vertex from graph
         if vertex in self.__graph_dict:
-            self.__graph_dict.pop('key', None)
             del self.__graph_dict[vertex]
         if vertex in self.__coord_dict:
             del self.__coord_dict[vertex]
