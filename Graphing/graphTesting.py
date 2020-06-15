@@ -34,7 +34,6 @@ def constructGraph(nodeFile, edgeFile, directed=True):
     with open(edgeFile, "r") as e:
         edges = e.readlines()
 
-
     g = dict()
     graph = Graph(g)
 

@@ -98,31 +98,7 @@ class Graph(object):
             self.__coord_dict[vertex] = []
         self.__coord_dict[vertex] = coord
 
-    # NEED TO OPTIMIZE (O(n) runtime when contracting), not sure if contraction operation is needed
     def remove_vertex(self, vertex):
-        """
-        if contract:
-            edges = self.__graph_dict[vertex]
-            outV = list()
-            inV = list()
-            lengthout = list()
-            lengthin = list()
-            for e in edges:
-                inV.append(e[1])
-                lengthin.append(e[2])
-
-            edges = self.edges()
-            for e in edges:
-                if e[1] == vertex:
-                    outV.append(e[0])
-                    self.remove_edge(e[0], e)
-                    lengthout.append(e[2])
-
-            for o in range(len(outV)):
-                for i in range(len(inV)):
-                    self.add_edge(outV[o], [outV[o], inV[i], lengthin[i] + lengthout[o]])
-
-        """
         # Remove all edges to vertex
         for v in self.vertices():
             self.__graph_dict[v].pop(vertex, None)
@@ -146,36 +122,36 @@ class Graph(object):
             self.set_nodeweight(vertex, 1)
             nodeData = self.__coord_dict[vertex]
             edgeData = self.__graph_dict[vertex]
-            newVertices = list()
+            new_vertices = list()
             while dupes > 1:
                 # Naming convention: new vertex by adding a letter after ID, i.e. 1a
                 myOrder = order
-                newVertex = str(vertex) + alphabet[myOrder % 26]
+                new_vertex = str(vertex) + alphabet[myOrder % 26]
                 while int(order / 26) > 0:
-                    newVertex += alphabet[myOrder % 26]
+                    new_vertex += alphabet[myOrder % 26]
                     myOrder -= 26
-                newVertices.append(newVertex)
-                newVertices.append(newVertex)
+                new_vertices.append(new_vertex)
+                new_vertices.append(new_vertex)
                 order += 1
                 dupes -= 1
 
                 # Add new vertex to graph with same data as original vertex
-                self.add_vertex(newVertex)
-                self.add_coords(newVertex, nodeData)
+                self.add_vertex(new_vertex)
+                self.add_coords(new_vertex, nodeData)
                 for e in edgeData:
-                    self.add_edge(newVertex, e, edgeData[e])
+                    self.add_edge(new_vertex, e, edgeData[e])
 
                 # Add edge to new vertex for all vertices with edge to original vertex
                 vertices = self.vertices()
                 for v in vertices:
                     if vertex in self.__graph_dict[v]:
-                        self.add_edge(v, newVertex, self.get_edgeweight(v, vertex))
+                        self.add_edge(v, new_vertex, self.get_edgeweight(v, vertex))
 
             # Add edge between all duplicated nodes, with edgeweight 0
-            for n in newVertices:
+            for n in new_vertices:
                 self.add_edge(vertex, n, 0.0)
                 self.add_edge(n, vertex, 0.0)
-                for m in newVertices:
+                for m in new_vertices:
                     if m != n:
                         self.add_edge(n, m, 0.0)
 

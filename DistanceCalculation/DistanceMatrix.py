@@ -1,6 +1,7 @@
 import math
 import random
 import heapq as hq
+import string
 
 Inf = float("Inf")
 
@@ -8,15 +9,11 @@ Inf = float("Inf")
 def Dijkstra(G, s):
     b = G.get_base()
     vertices = G.vertices()
-    visited = dict()
-    dist = dict()
+    visited = dict.fromkeys(vertices, False)
+    dist = dict.fromkeys(vertices, Inf)
     sortedDist = dict()
     finalDist = dict.fromkeys([w for w in vertices if G.get_nodeweight(w) > 0 or w == b])
     Q = [(0.0, s)]
-
-    for v in vertices:
-        visited[v] = False
-        dist[v] = Inf
 
     while Q:
         (length, node) = hq.heappop(Q)
@@ -41,16 +38,50 @@ def Dijkstra(G, s):
 
 def generateDistanceMatrix(graph):
     vertices = graph.vertices()
+    b = graph.get_base()
     matrix = dict()
     sortedMatrix = dict()
-    b = graph.get_base()
+    duped = dict()
+
     for v in vertices:
-        if graph.get_nodeweight(v) > 0 or v == b:
+        dupes = graph.get_nodeweight(v)
+        if dupes > 0 or v == b:
             sortedDist, finalDist = Dijkstra(graph, v)
             sortedMatrix[v] = sortedDist
             matrix[v] = finalDist
+            order = 1
+            duplicate_list = list()
+            while order < dupes:
+                new_ID = str(v) + get_name(order)
+                sortedMatrix[new_ID] = sortedDist
+                matrix[new_ID] = finalDist
+                order += 1
+                duplicate_list.append(new_ID)
+            duped[v] = duplicate_list
+
+    for v in duped.keys():
+        for r in matrix.keys():
+            add_to = dict.fromkeys(duped[v], matrix[r][v])
+            matrix[r].update(add_to)
 
     return matrix, sortedMatrix
+
+
+def get_name(num):
+
+    num2alphadict = dict(zip(range(1, 27), string.ascii_lowercase))
+    outval = ""
+    numloops = (num-1) // 26
+
+    if numloops > 0:
+        outval = outval + get_name(numloops)
+
+    remainder = num % 26
+    if remainder > 0:
+        outval = outval + num2alphadict[remainder]
+    else:
+        outval = outval + "z"
+    return outval
 
 
 # Generates a simple random distance matrix from input of dimensions of the plane and the number of elements
