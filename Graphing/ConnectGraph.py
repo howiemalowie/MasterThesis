@@ -5,14 +5,24 @@ This class finds the strongly connected component of the base vertex of the inpu
 and removes all vertices not part of the obtained SCC from the input graph.
 """
 
-
-def connectGraph(graph, rev_graph):
+""" 
+Connects graph using two different methods: If input graph was directed, 
+obtain the SCC of base vertex using the reverse graph.
+If undirected, remove all vertices not reached by base using DFS.
+"""
+def connectGraph(graph, rev_graph=None):
     base = graph.get_base()
     visited = DFS(graph, base)
-    rev_visited = DFS(rev_graph, base)
-    for v in graph.vertices():
-        if not visited[v] or not rev_visited[v]:
-            graph.remove_vertex(v)
+    if rev_graph is not None:
+        rev_visited = DFS(rev_graph, base)
+        for v in graph.vertices():
+            if not visited[v] or not rev_visited[v]:
+                graph.remove_vertex(v)
+
+    else:
+        for v in graph.vertices():
+            if not visited[v]:
+                graph.remove_vertex(v)
 
     return graph
 

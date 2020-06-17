@@ -6,6 +6,7 @@ from Graphing.GraphConstructor import Graph
 import matplotlib.pyplot as plt
 
 
+""" DEPRECATED FUNCTION"""
 def duplicatePluralWeightedNodes(graph, revGraph=None):
 
     if revGraph is not None:
@@ -26,6 +27,13 @@ def duplicatePluralWeightedNodes(graph, revGraph=None):
     return graph
 
 
+""" 
+Constructs a graph from input files of vertices and edges 
+INPUT FORMAT VERTEX: "vertex_id, longitude, latitude, weight"
+INPUT FORMAT EDGE: "edge_id, out_vertex, in_vertex, weight"
+INPUT PARAMETER: State if graph is directed or not.
+RETURN: graph if undirected + reverse graph if directed
+"""
 def constructGraph(nodeFile, edgeFile, directed=True):
 
     with open(nodeFile, "r") as n:
@@ -34,45 +42,39 @@ def constructGraph(nodeFile, edgeFile, directed=True):
     with open(edgeFile, "r") as e:
         edges = e.readlines()
 
-    g = dict()
-    graph = Graph(g)
+    graph = Graph()
 
-    """
-    if directed:
-        rg = dict()
-        revGraph = Graph(rg)
-
-        for v in vertices:
-            [index, lon, lat] = v.split(" ")
-            graph.add_vertex(index)
-            revGraph.add_vertex(index)
-            c = [float(lon), float(lat), 0]
-            graph.add_coords(index, c)
-            revGraph.add_coords(index, c)
-
-        for e in edges:
-            [index, outNode, inNode, length] = e.split(" ")
-            graph.add_edge(outNode, [outNode, inNode, float(length)])
-            revGraph.add_edge(inNode, [inNode, outNode, float(length)])
-
-        return graph, revGraph
-    """
     for v in vertices:
-        [index, lon, lat] = v.split(" ")
-        graph.add_vertex(index)
+        [id, lon, lat] = v.split(" ")
+        graph.add_vertex(id)
         c = [float(lon), float(lat), 0]
-        graph.add_coords(index, c)
+        graph.add_coords(id, c)
 
     for e in edges:
-        [index, outNode, inNode, length] = e.split(" ")
+        [_, outNode, inNode, length] = e.split(" ")
         graph.add_edge(outNode, inNode, float(length))
 
     if not directed:
         for e in edges:
-            [index, outNode, inNode, length] = e.split(" ")
+            [_, outNode, inNode, length] = e.split(" ")
+            graph.add_edge(inNode, outNode, float(length))
+        return graph
+
+    else:
+        revGraph = Graph()
+        for v in vertices:
+            [id, lon, lat] = v.split(" ")
+            revGraph.add_vertex(id)
+            c = [float(lon), float(lat), 0]
+            revGraph.add_coords(id, c)
+
+        for e in edges:
+            [_, outNode, inNode, length] = e.split(" ")
             graph.add_edge(inNode, outNode, float(length))
 
-    return graph
+        return graph, revGraph
+
+
 
 
 def scatter_plot(graph, distMatrix):
@@ -102,6 +104,7 @@ def scatter_plot(graph, distMatrix):
 
     plt.show()
 
+
 def main_test():
     file1 = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cnode"
     file2 = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cedge"
@@ -109,8 +112,8 @@ def main_test():
     directed = False
     graph = constructGraph(file1, file2, directed)
     size = len(graph.vertices())
-    graph = generatePOI(graph, int(20), True)
-    graph = connectGraph(graph, directed)
+    graph = connectGraph(graph)
+    graph = generatePOI(graph, int(size/50), True)
     graph = duplicatePluralWeightedNodes(graph)
     distMatrix, sortedDistMatrix = generateDistanceMatrix(graph)
     #scatter_plot(graph, distMatrix)

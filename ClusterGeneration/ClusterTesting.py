@@ -181,9 +181,9 @@ if __name__ == "__main__":
     #print("merging clusters:")
     agglomerate(Clusters)
     roots = []
-    for c in Clusters.values():
-        if c.get_parents() is None:
-            roots.append(c.get_clusterID())
+    for c in Clusters.get_all_clusters().values():
+        if c.get_parent() is None:
+            roots.append(c)
 
     solve_all_clusters(Clusters, roots)
     #print(Clusters)

@@ -47,14 +47,15 @@ def retrace_optimal_path(memo, n):
 
 def extract_linkage_matrix(cluster, matrix):
     linkMat = dict()
+    elements = cluster.get_elements()
     dummyStart = 's'
     dummyEnd = 'e'
     dummyBase = 'b2'
-    for e in cluster:
+    for el in elements:
         row = dict()
-        for el in cluster:
-            row[el] = matrix[e][el]
-        if e == cluster.get_base():
+        for ele in elements:
+            row[ele] = matrix[el][ele]
+        if el == cluster.get_base():
             row[dummyStart] = 0.0
             row[dummyEnd] = Inf
             linkMat[dummyBase] = row
@@ -62,7 +63,7 @@ def extract_linkage_matrix(cluster, matrix):
         else:
             row[dummyStart] = Inf
             row[dummyEnd] = Inf
-        linkMat[e] = row
+        linkMat[el] = row
     linkMat[dummyBase][dummyStart] = Inf
     linkMat[dummyBase][dummyEnd] = 0.0
     return linkMat
@@ -126,7 +127,7 @@ def get_all_clusters_in_tree(clusters, curr):
 def solve_all_clusters(clusterGroup, roots):
     matrix = clusterGroup.get_matrix()
 
-    for c in clusterGroup.get_all_clusters().keys:
+    for c in clusterGroup.get_all_clusters().values():
         linkMat = extract_linkage_matrix(c, matrix)
         res, route = Exact_TSP(linkMat)
         c.set_solution([res, route])

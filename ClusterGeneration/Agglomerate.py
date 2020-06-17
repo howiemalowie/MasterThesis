@@ -35,7 +35,8 @@ def merge_clusters(cluster1, cluster2):
 def agglomerate(clusters):
     avg_PQ = clusters.get_priority_queue()
     lmt = clusters.get_cluster_limit()
-    keys = clusters.get_all_clusters().keys()
+    cl = clusters.get_all_clusters()
+    keys = cl.keys()
     merged = {k: False for k in keys}
 
     while avg_PQ:
@@ -43,12 +44,12 @@ def agglomerate(clusters):
         if not merged[cID1] and not merged[cID2]:
             cluster1 = clusters.get_cluster(cID1)
             cluster2 = clusters.get_cluster(cID2)
-            newCluster = clusters.merge_clusters(cluster1, cluster2)
+            newCluster = merge_clusters(cluster1, cluster2)
             newID = newCluster.get_clusterID()
             # Update matrix
-            for cID, c in clusters.items():
+            for cID, c in cl.items():
                 if newCluster.get_cluster_size() + c.get_cluster_size() <= lmt\
-                        and not merged[c]:
+                        and not merged[cID]:
                     newDist = avg_linkage_clustering(newCluster, c, clusters.get_matrix())
                     heapq.heappush(avg_PQ, (newDist, cID, newID))
 
