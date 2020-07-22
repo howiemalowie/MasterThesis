@@ -1,4 +1,5 @@
 from ClusterGeneration.Agglomerate import buildClusters, agglomerate
+from ClusterGeneration.GreedyClustering import greedy_clustering
 from Graphing.graphTesting import main_test
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -173,18 +174,35 @@ def dendogram(Clusters):
 
 
 if __name__ == "__main__":
-    matrix, clusterLimit, b = main_test()
+    graph, matrix, clusterLimit, b = main_test()
 
     Clusters = buildClusters(matrix, clusterLimit, b)
+    coord_mat = graph.get_coord_dict()
 
-    #print(Clusters)
     #print("merging clusters:")
     agglomerate(Clusters)
+
+    greedyClusters = greedy_clustering(matrix, clusterLimit, b)
+    print(greedyClusters)
+
     roots = []
+    greedy_roots = greedyClusters.get_all_clusters().values()
     for c in Clusters.get_all_clusters().values():
         if c.get_parent() is None:
             roots.append(c)
+            print(c)
 
     solve_all_clusters(Clusters, roots)
-    #print(Clusters)
-    dendogram(Clusters)
+    sum = 0
+    for c in roots:
+        sol = c.get_solution()
+        sum += sol[0]
+
+    solve_all_clusters(greedyClusters, greedy_roots)
+    greedy_sum = 0
+    for c in greedy_roots:
+        sol = c.get_solution()
+        greedy_sum += sol[0]
+
+    print("Cluster sum:", sum)
+    print("Greedy sum:", greedy_sum)

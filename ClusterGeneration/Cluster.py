@@ -1,6 +1,7 @@
 class Cluster(object):
 
-    def __init__(self, cluster_ID, elem_list=None, base_elem=None, children=None,  parent=None, solution=None):
+    def __init__(self, cluster_ID, elem_list=None, base_elem=None, centroid=None,
+                 children=None,  parent=None, solution=None):
         if elem_list is None:
             elem_list = []
         if base_elem is None:
@@ -11,6 +12,7 @@ class Cluster(object):
         self.__elem_list = elem_list
         self.__base_elem = base_elem
         self.__solution = solution
+        self.__centroid = centroid
 
     def get_clusterID(self):
         return self.__cluster_ID
@@ -37,10 +39,16 @@ class Cluster(object):
         return len(self.get_elements()) - 1
 
     def set_solution(self, solv):
-        self.__solution = [solv]
+        self.__solution = solv
 
     def get_solution(self):
         return self.__solution
+
+    def set_centroid(self, centroid):
+        self.__centroid = centroid
+
+    def get_centroid(self):
+        return self.__centroid
 
     def add_element(self, elem):
         self.__elem_list.append(elem)

@@ -68,24 +68,9 @@ class ClusterGroup(object):
         for (c1ID, c1) in clusters.items():
             for (c2ID, c2) in clusters.items():
                 if c1ID != c2ID and c1.get_cluster_size() + c2.get_cluster_size() <= limit:
-                    res = avg_linkage_clustering(c1, c2, self.get_matrix())
+                    res = complete_linkage_clustering(c1, c2, self.get_matrix())
                     heapq.heappush(PQ, (res, c1ID, c2ID))
         return PQ
-
-    def merge_clusters(cluster1, cluster2):
-        ID1 = cluster1.get_clusterID()
-        ID2 = cluster2.get_clusterID()
-        ele1 = cluster1.get_elements()
-        ele2 = cluster2.get_elements()
-        newList = ele1 + list(set(ele2) - set(ele1))
-        newID = ID1 + ", " + ID2
-        base = cluster1.get_base()
-        children = [ID1, ID2]
-        newCluster = Cluster(newID, newList, base, children)
-        cluster1.set_parent(newID)
-        cluster2.set_parent(newID)
-
-        return newCluster
 
     def __str__(self):
         res = "Clusters:"
