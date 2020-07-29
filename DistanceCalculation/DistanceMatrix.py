@@ -7,12 +7,12 @@ Inf = float("Inf")
 
 
 def Dijkstra(G, s):
-    b = G.get_base()
+    d = G.get_depot()
     vertices = G.vertices()
     visited = dict.fromkeys(vertices, False)
     dist = dict.fromkeys(vertices, Inf)
     sortedDist = dict()
-    finalDist = dict.fromkeys([w for w in vertices if G.get_nodeweight(w) > 0 or w == b])
+    finalDist = dict.fromkeys([w for w in vertices if G.get_nodeweight(w) > 0 or w == d])
     Q = [(0.0, s)]
 
     while Q:
@@ -20,7 +20,7 @@ def Dijkstra(G, s):
         visited[node] = True
         dist[node] = length
 
-        if G.get_nodeweight(node) > 0 or node == b:
+        if G.get_nodeweight(node) > 0 or node == d:
             finalDist[node] = dist[node]
             sortedDist[node] = dist[node]
 
@@ -38,14 +38,14 @@ def Dijkstra(G, s):
 
 def generateDistanceMatrix(graph):
     vertices = graph.vertices()
-    b = graph.get_base()
+    d = graph.get_depot()
     matrix = dict()
     sortedMatrix = dict()
     duped = dict()
 
     for v in vertices:
         dupes = graph.get_nodeweight(v)
-        if dupes > 0 or v == b:
+        if dupes > 0 or v == d:
             sortedDist, finalDist = Dijkstra(graph, v)
             sortedMatrix[v] = sortedDist
             matrix[v] = finalDist

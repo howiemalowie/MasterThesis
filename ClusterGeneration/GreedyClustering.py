@@ -16,12 +16,9 @@ def greedy_clustering(link_mat, lmt, base):
                 if sz >= lmt:
                     break
                 if not clustered[elm]:
-                    if link_mat[k][elm] <= link_mat[k][base]:
                         elem_list.append(elm)
                         clustered[elm] = True
                         sz += 1
-                    else:
-                        break
 
             clusterList[str(clusterID)] = Cluster(str(clusterID), elem_list, base)
             clusterID += 1

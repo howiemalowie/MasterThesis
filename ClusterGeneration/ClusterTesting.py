@@ -1,14 +1,9 @@
 from ClusterGeneration.Agglomerate import buildClusters, agglomerate
 from ClusterGeneration.GreedyClustering import greedy_clustering
 from Graphing.graphTesting import main_test
-import networkx as nx
-import matplotlib.pyplot as plt
-from igraph import Graph, EdgeSeq
-import plotly.graph_objects as go
-
 from TSP.TravelingSalesPerson import solve_all_clusters
 
-
+"""
 def make_annotations(pos, text, M, font_size=10, font_color='rgb(250,250,250)'):
     L=len(pos)
     labels = range(L)
@@ -28,7 +23,7 @@ def make_annotations(pos, text, M, font_size=10, font_color='rgb(250,250,250)'):
 
 
 def dendogram(Clusters):
-    """
+    
     clusterList = Clusters.get_all_clusters()
     G = nx.Graph()
     G.add_nodes_from(clusterList.keys())
@@ -52,7 +47,7 @@ def dendogram(Clusters):
 
     nx.draw(G)
     plt.show()
-    """
+    
     clusterList = Clusters.get_all_clusters()
     nr_vertices = len(clusterList) + 1
     v_label = list(map(str, range(nr_vertices)))
@@ -136,7 +131,7 @@ def dendogram(Clusters):
                       )
     fig.show()
 
-    """
+    
     # Tree structure
     nodes = Clusters.get_all_clusters()
     leaves = set(n for n in nodes if n.get_children() is None)

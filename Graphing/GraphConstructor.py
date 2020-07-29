@@ -1,7 +1,7 @@
 
 class Graph(object):
 
-    def __init__(self, graph_dict=None, coord_dict=None, base_vertex=None):
+    def __init__(self, graph_dict=None, coord_dict=None, depot_vertex=None):
         """ initializes a graph object
             If no dictionary or None is given,
             an empty dictionary will be created
@@ -10,11 +10,11 @@ class Graph(object):
             graph_dict = {}
         if coord_dict is None:
             coord_dict = {}
-        if base_vertex is None:
-            base_vertex = 'B'
+        if depot_vertex is None:
+            depot_vertex = 'D'
         self.__graph_dict = graph_dict
         self.__coord_dict = coord_dict
-        self.__base_vertex = base_vertex
+        self.__depot_vertex = depot_vertex
 
     def vertices(self):
         """ returns the vertices of a graph """
@@ -55,13 +55,13 @@ class Graph(object):
         """ returns neighbor set of given vertex """
         return self.__graph_dict[vertex].keys()
 
-    def set_base(self, vertex):
+    def set_depot(self, vertex):
         """ sets the given vertex as the base vertex of the graph"""
-        self.__base_vertex = vertex
+        self.__depot_vertex = vertex
 
-    def get_base(self):
+    def get_depot(self):
         """ returns the base vertex of the graph"""
-        return self.__base_vertex
+        return self.__depot_vertex
 
     def add_vertex(self, vertex):
         """ If the vertex "vertex" is not in

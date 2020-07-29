@@ -1,3 +1,5 @@
+import math
+
 from DistanceCalculation.DistanceMatrix import generateDistanceMatrix
 from Graphing.ConnectGraph import *
 from Graphing.GeneratePOI import *
@@ -5,6 +7,7 @@ from Graphing.GraphConstructor import Graph
 
 import matplotlib.pyplot as plt
 
+from Graphing.SubGraphing import subGraphCoord
 
 """ DEPRECATED FUNCTION"""
 def duplicatePluralWeightedNodes(graph, revGraph=None):
@@ -43,33 +46,53 @@ def constructGraph(nodeFile, edgeFile, directed=True):
         edges = e.readlines()
 
     graph = Graph()
+    select_as_depot = random.randint(0, len(vertices)-1)
+    old_id = 0
+    for i, v in enumerate(vertices):
 
-    for v in vertices:
         [id, lon, lat] = v.split(" ")
+        if i == select_as_depot:
+            old_id = id
+            id = "D"
         graph.add_vertex(id)
         c = [float(lon), float(lat), 0]
         graph.add_coords(id, c)
 
     for e in edges:
         [_, outNode, inNode, length] = e.split(" ")
+        if outNode == old_id:
+            outNode = "D"
+        elif inNode == old_id:
+            inNode = "D"
         graph.add_edge(outNode, inNode, float(length))
 
     if not directed:
         for e in edges:
             [_, outNode, inNode, length] = e.split(" ")
+            if outNode == old_id:
+                outNode = "D"
+            elif inNode == old_id:
+                inNode = "D"
             graph.add_edge(inNode, outNode, float(length))
         return graph
 
     else:
         revGraph = Graph()
-        for v in vertices:
+        for i, v in enumerate(vertices):
             [id, lon, lat] = v.split(" ")
+            if i == select_as_depot:
+                id = "D"
+
             revGraph.add_vertex(id)
             c = [float(lon), float(lat), 0]
             revGraph.add_coords(id, c)
 
         for e in edges:
             [_, outNode, inNode, length] = e.split(" ")
+            if outNode == old_id:
+                outNode = "D"
+            elif inNode == old_id:
+                inNode = "D"
             graph.add_edge(inNode, outNode, float(length))
 
         return graph, revGraph
@@ -106,18 +129,23 @@ def scatter_plot(graph, distMatrix):
 
 
 def main_test():
-    file1 = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cnode"
-    file2 = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cedge"
-    tripLimit = 5
+    node_file = "C:/Users/HavardNotland/Documents/MasterThesis/GraphData/cal.cnode"
+    edge_file = "C:/Users/HavardNotland/Documents/MasterThesis/GraphData/cal.cedge"
+
+    success = False
+    while not success:
+        success, file1, file2 = subGraphCoord(node_file, edge_file, True)
     directed = False
     graph = constructGraph(file1, file2, directed)
-    size = len(graph.vertices())
     graph = connectGraph(graph)
-    graph = generatePOI(graph, int(size/50), True)
+    size = len(graph.vertices())
+    print("Graph size", size)
+    tour_limit = math.ceil(size / 50)
+    graph = generatePOI(graph, math.ceil(size/20))
     graph = duplicatePluralWeightedNodes(graph)
     distMatrix, sortedDistMatrix = generateDistanceMatrix(graph)
     #scatter_plot(graph, distMatrix)
-    return sortedDistMatrix, tripLimit, graph.get_base()
+    return graph, sortedDistMatrix, tour_limit, graph.get_depot()
     #Output formatting
     """
     print("Input:")
