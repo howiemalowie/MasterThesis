@@ -1,46 +1,32 @@
 # from GraphConstructor import Graph
 import random
+import numpy as np
 
 
 def generatePOI(graph, amount, onSameNode=True):
-    prob = amount / len(graph.vertices())
-    done = False
+    sz = len(graph.vertices())-1
     if onSameNode:
-            while not done:
-                rand = graph.vertices()
-                random.shuffle(rand)
-                for v in rand:
-                    if v != graph.get_base():
-                        if random.random() <= prob:
-                            w = graph.get_nodeweight(v)+1
-                            graph.set_nodeweight(v, w)
-                            amount -= 1
-                            if amount == 0:
-                                done = True
-                                break
-                            prob = amount / len(graph.vertices())
+
+        distribution = np.random.dirichlet(np.ones(sz), size=amount)
+
+        for v, i in enumerate(graph.vertices()):
+            if v == graph.get_depot():
+                i -= 1
+            else:
+                graph.set_nodeweight(round(distribution[i]))
 
     else:
-        if prob > 1:
-            for v in graph.vertices():
-                if v != graph.get_base():
-                    graph.set_nodeweight(v, 1)
-        else:
-            while not done:
-                rand = graph.vertices()
-                random.shuffle(rand)
-                for v in rand:
-                    if graph.get_nodeweight(v) > 0:
-                        continue
-                    else:
-                        if v != graph.get_base():
-                            if random.random() <= prob:
-                                graph.set_nodeweight(v, 1)
-                                amount -= 1
-                                if amount == 0:
-                                    done = True
-                                    break
+
+        distribution = np.ones(amount) + np.zeros(len(graph.vertices()))
+        rand = random.shuffle(distribution)
+        for v, i in enumerate(graph.vertices()):
+            if v == graph.get_depot():
+                i -= 1
+            else:
+                graph.set_nodeweight(rand[i])
+
     return graph
+
 
 """
 def removeEmptyNodes(graph, revGraph=None):

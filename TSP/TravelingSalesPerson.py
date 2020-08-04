@@ -16,17 +16,17 @@ def extract_linkage_matrix(cluster, matrix):
 
 
 def nearest_neighbors(linkMat):
-    init_tour = ['B']
+    init_tour = ['D']
     visited = dict.fromkeys(linkMat, False)
-    visited['B'] = True
-    curr = 'B'
+    visited['D'] = True
+    curr = 'D'
     while len(init_tour) < len(linkMat):
         for i in linkMat[curr].keys():
             if not visited[i]:
                 init_tour.append(i)
                 visited[i] = True
                 curr = i
-    init_tour.append('B')
+    init_tour.append('D')
     return init_tour
 
 

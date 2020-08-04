@@ -65,10 +65,11 @@ class ClusterGroup(object):
         PQ = list()
         clusters = self.get_all_clusters()
         limit = self.get_cluster_limit()
+        matrix = self.get_matrix()
         for (c1ID, c1) in clusters.items():
             for (c2ID, c2) in clusters.items():
                 if c1ID != c2ID and c1.get_cluster_size() + c2.get_cluster_size() <= limit:
-                    res = complete_linkage_clustering(c1, c2, self.get_matrix())
+                    res = complete_linkage_clustering(c1, c2, matrix)
                     heapq.heappush(PQ, (res, c1ID, c2ID))
         return PQ
 

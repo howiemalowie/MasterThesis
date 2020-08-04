@@ -7,12 +7,12 @@ Inf = float("Inf")
 
 
 def Dijkstra(G, s):
-    b = G.get_base()
+    d = G.get_depot()
     vertices = G.vertices()
     visited = dict.fromkeys(vertices, False)
     dist = dict.fromkeys(vertices, Inf)
     sortedDist = dict()
-    finalDist = dict.fromkeys([w for w in vertices if G.get_nodeweight(w) > 0 or w == b])
+    # finalDist = dict.fromkeys([w for w in vertices if G.get_nodeweight(w) > 0 or w == d])
     Q = [(0.0, s)]
 
     while Q:
@@ -20,51 +20,41 @@ def Dijkstra(G, s):
         visited[node] = True
         dist[node] = length
 
-        if G.get_nodeweight(node) > 0 or node == b:
-            finalDist[node] = dist[node]
+        wght = G.get_nodeweight(node)
+        if wght > 0 or node == d:
+            # finalDist[node] = dist[node]
             sortedDist[node] = dist[node]
+            for i in range(1, wght):
+                new_ID = str(node) + get_name(i)
+                sortedDist[new_ID] = dist[node]
 
         neighbors = G.get_neighbors(node)
         for n in neighbors:
             if not visited[n]:
-                weight = G.get_edgeweight(node, n)
-                if weight != -1:
-                    if dist[n] > dist[node] + weight:
-                        dist[n] = dist[node] + weight
+                edge_weight = G.get_edgeweight(node, n)
+                if edge_weight != -1:
+                    if dist[n] > dist[node] + edge_weight:
+                        dist[n] = dist[node] + edge_weight
                         hq.heappush(Q, (dist[n], n))
 
-    return sortedDist, finalDist
+    return sortedDist
 
 
 def generateDistanceMatrix(graph):
     vertices = graph.vertices()
-    b = graph.get_base()
-    matrix = dict()
+    d = graph.get_depot()
     sortedMatrix = dict()
-    duped = dict()
 
     for v in vertices:
-        dupes = graph.get_nodeweight(v)
-        if dupes > 0 or v == b:
-            sortedDist, finalDist = Dijkstra(graph, v)
-            sortedMatrix[v] = sortedDist
-            matrix[v] = finalDist
-            order = 1
-            duplicate_list = list()
-            while order < dupes:
-                new_ID = str(v) + get_name(order)
-                sortedMatrix[new_ID] = sortedDist
-                matrix[new_ID] = finalDist
-                order += 1
-                duplicate_list.append(new_ID)
-            duped[v] = duplicate_list
+            wght = graph.get_nodeweight(v)
+            if wght > 0 or v == d:
+                sortedDist = Dijkstra(graph, v)
+                sortedMatrix[v] = sortedDist
+                for i in range(1, wght):
+                    new_ID = str(v) + get_name(i)
+                    sortedMatrix[new_ID] = sortedDist
 
-    for v in duped.keys():
-        for r in matrix.keys():
-            add_to = dict.fromkeys(duped[v], matrix[r][v])
-            matrix[r].update(add_to)
-
-    return matrix, sortedMatrix
+    return sortedMatrix
 
 
 def get_name(num):
