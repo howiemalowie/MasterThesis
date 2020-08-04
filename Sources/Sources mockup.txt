@@ -1,5 +1,15 @@
 Sources:
-Graph implementation: https://www.python-course.eu/graphs_python.php
-Agglomerative hierarchical clustering: https://www.datanovia.com/en/lessons/agglomerative-hierarchical-clustering/
 
+Cutting plane method: http://www.math.uwaterloo.ca/tsp/methods/dfj/index.html 
+Agglomerative hierarchical clustering: https://www.datanovia.com/en/lessons/agglomerative-hierarchical-clustering/
+Greedy algorithms: https://en.wikipedia.org/wiki/Greedy_algorithm
+Priority Queue: https://nlp.stanford.edu/IR-book/pdf/17hier.pdf
+2-opt: https://www.dcs.warwick.ac.uk/~englert/publications/tsp_soda07_full.pdf
 Birdcatcher image: https://www.mercurynews.com/2018/07/09/where-birds-and-limes-go-after-dark-the-race-to-charge-bay-areas-scooters/
+
+Isosceles right triangle: https://mathworld.wolfram.com/IsoscelesRightTriangle.html
+All pairs shortest path: https://www.geeksforgeeks.org/floyd-warshall-algorithm-dp-16/
+Graph implementation: https://www.python-course.eu/graphs_python.php
+Cluster implementation https://github.com/lbehnke/hierarchical-clustering-java
+Hierarchical clustering on distance matrix: https://people.revoledu.com/kardi/tutorial/Clustering/Hierarchical%20Clustering%20Algorithm.htm
+Priority Queue Dictionary implementation: http://code.activestate.com/recipes/578643-priority-queue-dictionary/

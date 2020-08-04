@@ -108,16 +108,16 @@ def scatter_plot(graph, distMatrix):
 def main_test():
     file1 = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cnode"
     file2 = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cedge"
-    tripLimit = 5
+    tripLimit = 20
     directed = False
     graph = constructGraph(file1, file2, directed)
     size = len(graph.vertices())
     graph = connectGraph(graph)
-    graph = generatePOI(graph, int(size/50), True)
+    graph = generatePOI(graph, int(size/5), True)
     graph = duplicatePluralWeightedNodes(graph)
     distMatrix, sortedDistMatrix = generateDistanceMatrix(graph)
     #scatter_plot(graph, distMatrix)
-    return sortedDistMatrix, tripLimit, graph.get_base()
+    return graph, sortedDistMatrix, tripLimit, graph.get_base()
     #Output formatting
     """
     print("Input:")
