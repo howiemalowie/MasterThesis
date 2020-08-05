@@ -4,28 +4,27 @@ import numpy as np
 
 
 def generatePOI(graph, amount, onSameNode=True):
-    sz = len(graph.vertices())-1
+    vertices = graph.vertices()
+    vertices.remove(graph.get_depot())
+    sz = len(vertices)
+    cnt = 0
     if onSameNode:
 
-        distribution = np.random.dirichlet(np.ones(sz), size=amount)
+        distribution = np.random.dirichlet(np.ones(sz)) * amount
 
-        for v, i in enumerate(graph.vertices()):
-            if v == graph.get_depot():
-                i -= 1
-            else:
-                graph.set_nodeweight(round(distribution[i]))
+        for i, v in enumerate(vertices):
+            weight = int(round(distribution[i]))
+            cnt += weight
+            graph.set_nodeweight(v, weight)
 
     else:
 
-        distribution = np.ones(amount) + np.zeros(len(graph.vertices()))
+        distribution = np.ones(amount) + np.zeros(len(graph.vertices()) - amount)
         rand = random.shuffle(distribution)
-        for v, i in enumerate(graph.vertices()):
-            if v == graph.get_depot():
-                i -= 1
-            else:
-                graph.set_nodeweight(rand[i])
-
-    return graph
+        for i, v in enumerate(vertices):
+            graph.set_nodeweight(rand[i])
+            cnt += rand[i]
+    return cnt
 
 
 """

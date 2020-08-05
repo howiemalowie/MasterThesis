@@ -26,8 +26,6 @@ def connectGraph(graph, rev_graph=None):
             if not visited[v]:
                 graph.remove_vertex(v)
 
-    return graph
-
 
 def DFS(graph, v):
     visited = dict.fromkeys(graph.vertices(), False)

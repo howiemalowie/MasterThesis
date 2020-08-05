@@ -15,27 +15,27 @@ def extract_linkage_matrix(cluster, matrix):
     return linkMat
 
 
-def nearest_neighbors(linkMat):
-    init_tour = ['D']
+def nearest_neighbors(linkMat, d):
+    init_tour = [d]
     visited = dict.fromkeys(linkMat, False)
-    visited['D'] = True
-    curr = 'D'
+    visited[d] = True
+    curr = d
     while len(init_tour) < len(linkMat):
         for i in linkMat[curr].keys():
             if not visited[i]:
                 init_tour.append(i)
                 visited[i] = True
                 curr = i
-    init_tour.append('D')
+    init_tour.append(d)
     return init_tour
 
 
-def solve_all_clusters(clusterGroup, roots):
+def solve_all_clusters(clusterGroup, roots, depot):
     matrix = clusterGroup.get_matrix()
 
     for r in roots:
         linkMat = extract_linkage_matrix(r, matrix)
-        init_tour = nearest_neighbors(linkMat)
+        init_tour = nearest_neighbors(linkMat, depot)
         res, tour = two_opt(linkMat, init_tour)
         r.set_solution([res, tour])
 
