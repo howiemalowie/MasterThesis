@@ -4,13 +4,13 @@ from ClusterGeneration.Cluster import Cluster
 from ClusterGeneration.ClusterGroup import ClusterGroup
 
 
-def buildClusters(matrix, clusterLimit, base):
+def buildClusters(matrix, clusterLimit, depot):
     clusterList = dict()
     clusterID = 0
     for k in matrix.keys():
-        if k != base:
-            elem_list = [base, k]
-            clusterList[str(clusterID)] = Cluster(str(clusterID), elem_list, base)
+        if k != depot:
+            elem_list = [depot, k]
+            clusterList[str(clusterID)] = Cluster(str(clusterID), elem_list, depot)
             clusterID += 1
     clusterGroup = ClusterGroup(matrix, clusterLimit, clusterList)
     return clusterGroup
@@ -23,9 +23,9 @@ def merge_clusters(cluster1, cluster2):
     ele2 = cluster2.get_elements()
     newList = ele1 + list(set(ele2) - set(ele1))
     newID = ID1 + ", " + ID2
-    base = cluster1.get_base()
+    depot = cluster1.get_depot()
     children = [ID1, ID2]
-    newCluster = Cluster(newID, newList, base, children)
+    newCluster = Cluster(newID, newList, depot, None, children)
     cluster1.set_parent(newID)
     cluster2.set_parent(newID)
 

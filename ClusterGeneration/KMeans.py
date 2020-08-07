@@ -10,8 +10,13 @@ def find_new_centroid(cluster, coord_dict, mean_lon, mean_lat):
     min_dist = float("inf")
     new_centroid = ""
     for p in cluster.get_elements():
-        lon = coord_dict[p][0]
-        lat = coord_dict[p][1]
+        if p == cluster.get_depot():
+            continue
+        else:
+            coord_key = ''.join(ch for ch in p if ch.isdigit())
+
+        lon = coord_dict[coord_key][0]
+        lat = coord_dict[coord_key][1]
         dist = euclid_dist(lon, lat, mean_lon, mean_lat)
         if dist < min_dist:
             new_centroid = p
@@ -29,15 +34,15 @@ def kmeans(graph, link_mat, k, lmt):
     depot = graph.get_depot()
     clusters = dict()
     cluster_id = 0
-    elementLookUp = dict.fromkeys(link_mat.keys(), None)
+    centroidLookUp = dict.fromkeys(link_mat.keys(), False)
 
     # Randomly select k elements to be initial centroids
     lst = list(link_mat.keys())
     lst.remove(depot)
     random.shuffle(lst)
     for i in range(k):
-        centroid = lst[i]
-        clusters[str(cluster_id)] = Cluster(cluster_id, [depot, lst[i]], depot, centroid)
+        clusters[str(cluster_id)] = Cluster(str(cluster_id), [depot, lst[i]], depot, lst[i])
+        centroidLookUp[lst[i]] = True
         cluster_id += 1
 
     done = False
@@ -45,7 +50,7 @@ def kmeans(graph, link_mat, k, lmt):
 
         # Assign each point to cluster corresponding to the closest centroid that has not reached cluster size limit
         for key in link_mat.keys():
-            if key == depot:
+            if key == depot or centroidLookUp[key]:
                 continue
 
             distances = list()
@@ -56,26 +61,42 @@ def kmeans(graph, link_mat, k, lmt):
 
             while True:
                 (_, closest_cluster_id) = heapq.heappop(distances)
-                if clusters[closest_cluster_id].get_cluster_size() < lmt:
+                if clusters[closest_cluster_id].get_cluster_size() < lmt or not distances:
+                    clusters[closest_cluster_id].add_element(key)
                     break
-
-            remove_key = elementLookUp[key]
-            if remove_key != closest_cluster_id and remove_key is not None:
-                clusters[remove_key].remove_element(key)
-                clusters[closest_cluster_id].add_element(key)
-                elementLookUp[key] = closest_cluster_id
 
         # Update centroids. If no centroids change, end
         done = True
         for c in clusters.values():
             elements = c.get_elements()
-            mean_lat = sum([coord_dict[p][0] for p in elements])/c.get_cluster_size()
-            mean_lon = sum([coord_dict[p][1] for p in elements])/c.get_cluster_size()
+            mean_lat = 0
+            mean_lon = 0
+            for p in elements:
+                if p == depot:
+                    continue
+                else:
+                    coord_key = ''.join(ch for ch in p if ch.isdigit())
+                mean_lat += coord_dict[coord_key][0]
+                mean_lon += coord_dict[coord_key][1]
+
+            mean_lat /= c.get_cluster_size()
+            mean_lon /= c.get_cluster_size()
 
             new_centroid = find_new_centroid(c, coord_dict, mean_lon, mean_lat)
-            if new_centroid != c.get_centroid():
+            old_centroid = c.get_centroid()
+            if new_centroid != old_centroid:
                 done = False
                 c.set_centroid(new_centroid)
+                centroidLookUp[old_centroid] = False
+                centroidLookUp[new_centroid] = True
+
+        if not done:
+            for c_key in clusters.keys():
+                centroid = clusters[c_key].get_centroid()
+                if centroid == depot:
+                    clusters[c_key] = Cluster(c_key, [depot], depot, depot)
+                else:
+                    clusters[c_key] = Cluster(c_key, [depot, centroid], depot, centroid)
 
     # Create clusterGroup once all clusters are finalized
     clusterGroup = ClusterGroup(link_mat, lmt, clusters)
