@@ -1,5 +1,6 @@
 from TSP.DynProg import Exact_TSP
 from TSP.two_opt import two_opt
+from TSP.held_karp import held_karp
 
 
 def extract_linkage_matrix(cluster, matrix):
@@ -35,8 +36,13 @@ def solve_all_clusters(clusterGroup, roots, depot):
 
     for r in roots:
         linkMat = extract_linkage_matrix(r, matrix)
-        init_tour = nearest_neighbors(linkMat, depot)
-        res, tour = two_opt(linkMat, init_tour)
+        if len(linkMat) > 15:
+            print("solving using 2-opt")
+            init_tour = nearest_neighbors(linkMat, depot)
+            res, tour = two_opt(linkMat, init_tour)
+        else:
+            print("solving using Held-Karp")
+            res, tour = held_karp(linkMat)
         r.set_solution([res, tour])
 
 

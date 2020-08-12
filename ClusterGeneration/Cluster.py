@@ -63,6 +63,7 @@ class Cluster(object):
 
     def __str__(self):
         res = "\nCluster ID: " + str(self.get_clusterID())
+        res += "\nCluster size: " + str(self.get_cluster_size())
         res += "\nDepot: " + str(self.get_depot())
         res += "\nCentroid: " + str(self.get_centroid())
         res += "\nTour: "

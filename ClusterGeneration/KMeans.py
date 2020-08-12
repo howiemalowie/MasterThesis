@@ -61,7 +61,7 @@ def kmeans(graph, link_mat, k, lmt):
 
             while True:
                 (_, closest_cluster_id) = heapq.heappop(distances)
-                if clusters[closest_cluster_id].get_cluster_size() < lmt or not distances:
+                if clusters[closest_cluster_id].get_cluster_size() < lmt:
                     clusters[closest_cluster_id].add_element(key)
                     break
 
