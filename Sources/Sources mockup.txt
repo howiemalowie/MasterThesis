@@ -13,3 +13,7 @@ Graph implementation: https://www.python-course.eu/graphs_python.php
 Cluster implementation https://github.com/lbehnke/hierarchical-clustering-java
 Hierarchical clustering on distance matrix: https://people.revoledu.com/kardi/tutorial/Clustering/Hierarchical%20Clustering%20Algorithm.htm
 Priority Queue Dictionary implementation: http://code.activestate.com/recipes/578643-priority-queue-dictionary/
+k means clustering: https://core.ac.uk/download/pdf/61217069.pdf
+Held-Karp: https://www.math.cmu.edu/~af1p/Teaching/OR2/Projects/P58/OR2_Paper.pdf
+Clustering on TSP: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6104944/
+MTSP: https://www.sciencedirect.com/science/article/pii/S0305048304001550
