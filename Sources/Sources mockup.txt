@@ -17,3 +17,8 @@ k means clustering: https://core.ac.uk/download/pdf/61217069.pdf
 Held-Karp: https://www.math.cmu.edu/~af1p/Teaching/OR2/Projects/P58/OR2_Paper.pdf
 Clustering on TSP: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6104944/
 MTSP: https://www.sciencedirect.com/science/article/pii/S0305048304001550
+KLINK: http://www.aece.ro/abstractplus.php?year=2017&number=4&article=10
+Capactied vehicle routing problem: https://www.researchgate.net/publication/332370693_CAPACITATED_VEHICLE_ROUTING_PROBLEM
+Origin of clustering and K means: http://www.jehps.net/Decembre2008/Bock.pdf
+Heapify: https://www.growingwiththeweb.com/data-structures/binary-heap/build-heap-proof/
+K means centroid initialization: http://ilpubs.stanford.edu:8090/778/1/2006-13.pdf
