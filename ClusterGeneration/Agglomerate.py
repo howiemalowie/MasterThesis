@@ -48,12 +48,13 @@ def agglomerate(clusters):
             newCluster = merge_clusters(cluster1, cluster2)
             newID = newCluster.get_clusterID()
 
-            # Update matrix
+            # Update matrix and rebuild heap
             for cID, c in cl.items():
                 if newCluster.get_cluster_size() + c.get_cluster_size() <= lmt\
                         and not merged[cID]:
                     newDist = complete_linkage_clustering(newCluster, c, clusters.get_matrix())
-                    heapq.heappush(cmpl_PQ, (newDist, cID, newID))
+                    cmpl_PQ.append(newDist, cID, newID)
+            heapq.heapify(cmpl_PQ)
 
             clusters.add_cluster(newCluster)
             merged[newID] = False

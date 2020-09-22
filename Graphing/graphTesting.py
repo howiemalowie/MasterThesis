@@ -129,23 +129,16 @@ def scatter_plot(graph, distMatrix):
 
 
 def main_test():
-    node_file = "C:/Users/havar/Documents/MasterThesis/GraphData/cal.cnode"
-    edge_file = "C:/Users/havar/Documents/MasterThesis/GraphData/cal.cedge"
+    node_file = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cnode"
+    edge_file = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cedge"
 
-    success = False
-    while not success:
-        success, file1, file2 = subGraphCoord(node_file, edge_file, False)
-    directed = False
-    graph = constructGraph(file1, file2, directed)
+    graph = constructGraph(node_file, edge_file, directed=False)
     graph = connectGraph(graph)
     size = len(graph.vertices())
-    print("Graph size", math.ceil(size/20))
-    tour_limit = math.ceil(size/50)
-    graph = generatePOI(graph, math.ceil(size))
-    #graph = duplicatePluralWeightedNodes(graph)
+    print("Graph size", size)
+    graph = generatePOI(graph, 1000)
     sortedDistMatrix = generateDistanceMatrix(graph)
-    #scatter_plot(graph, distMatrix)
-    return graph, sortedDistMatrix, tour_limit, graph.get_depot()
+    return graph, sortedDistMatrix, graph.get_depot()
     #Output formatting
     """
     print("Input:")

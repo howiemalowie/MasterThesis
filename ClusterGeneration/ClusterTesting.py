@@ -169,7 +169,7 @@ def dendogram(Clusters):
 
 
 if __name__ == "__main__":
-    graph, matrix, clusterLimit, b = main_test()
+    graph, matrix, d = main_test()
 
     Clusters = buildClusters(matrix, clusterLimit, b)
     coord_mat = graph.get_coord_dict()

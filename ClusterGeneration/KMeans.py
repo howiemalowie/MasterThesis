@@ -5,6 +5,37 @@ from ClusterGeneration.Cluster import Cluster
 from ClusterGeneration.ClusterGroup import ClusterGroup
 
 
+def plusplus(link_mat, centroidLookUp, k, depot):
+    lst = list(link_mat.keys())
+    centroids = list()
+    clusters = dict()
+    lst.remove(depot)
+
+    # First centroid
+    idx = random.randint(0, len(lst)-1)
+    clusters[str(0)] = Cluster(Cluster(str(0), [depot, lst[idx]], depot, lst[idx]))
+    centroidLookUp[lst[idx]] = True
+    centroids.append(idx)
+
+    # Calculate probability
+    D = [min(link_mat[x][y] for y in centroids) for x in lst]
+    s = sum(D)
+    P = [x / s for x in D]
+    # Subsequent centroids
+    for i in range(1, k):
+        idx = random.choice(range(0, len(lst)-1), P)
+        clusters[str(i)] = Cluster(Cluster(str(i), [depot, lst[idx]], depot, lst[idx]))
+        centroidLookUp[lst[idx]] = True
+        centroids.append(idx)
+
+        # Update probabilities
+        D = [min(link_mat[x][y] for y in centroids) for x in lst]
+        s = sum(D)
+        P = [x / s for x in centroids]
+
+    return clusters
+
+
 def find_new_centroid(cluster, coord_dict, mean_lon, mean_lat):
 
     min_dist = float("inf")
@@ -29,21 +60,22 @@ def euclid_dist(x1, y1, x2, y2):
     return math.sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2))
 
 
-def kmeans(graph, link_mat, k, lmt):
-    coord_dict = graph.get_coord_dict()
-    depot = graph.get_depot()
-    clusters = dict()
-    cluster_id = 0
-    centroidLookUp = dict.fromkeys(link_mat.keys(), False)
+def kmeans(link_mat, coord_dict, depot, K, lmt, init):
 
-    # Randomly select k elements to be initial centroids
-    lst = list(link_mat.keys())
-    lst.remove(depot)
-    random.shuffle(lst)
-    for i in range(k):
-        clusters[str(cluster_id)] = Cluster(str(cluster_id), [depot, lst[i]], depot, lst[i])
-        centroidLookUp[lst[i]] = True
-        cluster_id += 1
+    centroidLookUp = dict.fromkeys(link_mat.keys(), False)
+    if init == "RANDOM":
+        clusters = dict()
+        cluster_id = 0
+        # Randomly select k elements to be initial centroids
+        lst = list(link_mat.keys())
+        lst.remove(depot)
+        random.shuffle(lst)
+        for i in range(K):
+            clusters[str(cluster_id)] = Cluster(str(cluster_id), [depot, lst[i]], depot, lst[i])
+            centroidLookUp[lst[i]] = True
+            cluster_id += 1
+    else:
+        clusters = plusplus(link_mat, centroidLookUp, K, depot)
 
     done = False
     while not done:
