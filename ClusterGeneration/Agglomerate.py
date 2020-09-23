@@ -4,15 +4,25 @@ from ClusterGeneration.Cluster import Cluster
 from ClusterGeneration.ClusterGroup import ClusterGroup
 
 
-def buildClusters(matrix, clusterLimit, depot):
-    clusterList = dict()
+def buildClusters(matrix, clusterLimit, depot, cf, include):
+    clusterDict = dict()
     clusterID = 0
     for k in matrix.keys():
         if k != depot:
             elem_list = [depot, k]
-            clusterList[str(clusterID)] = Cluster(str(clusterID), elem_list, depot)
+            clusterDict[str(clusterID)] = Cluster(str(clusterID), elem_list, depot)
             clusterID += 1
-    clusterGroup = ClusterGroup(matrix, clusterLimit, clusterList)
+
+    PQ = list()
+    for c1ID in clusterDict.keys():
+        for c2ID in clusterDict.keys():
+            c1 = clusterDict[c1ID]
+            c2 = clusterDict[c2ID]
+            res = compute_cost_func(c1, c2, matrix, cf, include)
+            PQ.append((res, c1ID, c2ID))
+
+    heapq.heapify(PQ)
+    clusterGroup = ClusterGroup(matrix, clusterLimit, clusterDict, PQ)
     return clusterGroup
 
 
@@ -32,12 +42,25 @@ def merge_clusters(cluster1, cluster2):
     return newCluster
 
 
-def agglomerate(clusters):
+def compute_cost_func(c1, c2, link_mat, cf, include):
+    k = min(c1.get_cluster_size() // 4, c2.get_cluster_size() // 4)
+    if k <= 0:
+        k = 1
+    if cf == "CLINK":
+        return complete_linkage_clustering(c1, c2, link_mat, include)
+    elif cf == "K-SLINK":
+        return K_single_linkage_clustering(c1, c2, link_mat, k, include)
+    else:
+        return K_complete_linkage_clustering(c1, c2, link_mat, k, include)
+
+
+def agglomerate(clusters, cf, include):
     cmpl_PQ = clusters.get_priority_queue()
     lmt = clusters.get_cluster_limit()
     cl = clusters.get_all_clusters()
     keys = cl.keys()
     merged = {k: False for k in keys}
+    link_mat = clusters.get_matrix()
 
     while cmpl_PQ:
         (dist, cID1, cID2) = heapq.heappop(cmpl_PQ)
@@ -52,8 +75,8 @@ def agglomerate(clusters):
             for cID, c in cl.items():
                 if newCluster.get_cluster_size() + c.get_cluster_size() <= lmt\
                         and not merged[cID]:
-                    newDist = complete_linkage_clustering(newCluster, c, clusters.get_matrix())
-                    cmpl_PQ.append(newDist, cID, newID)
+                    newDist = compute_cost_func(newCluster, c, link_mat, cf, include)
+                    cmpl_PQ.append((newDist, cID, newID))
             heapq.heapify(cmpl_PQ)
 
             clusters.add_cluster(newCluster)

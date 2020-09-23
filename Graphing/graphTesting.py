@@ -133,12 +133,13 @@ def main_test():
     edge_file = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cedge"
 
     graph = constructGraph(node_file, edge_file, directed=False)
-    graph = connectGraph(graph)
+    connectGraph(graph)
     size = len(graph.vertices())
     print("Graph size", size)
-    graph = generatePOI(graph, 1000)
+    poi_size = generatePOI(graph, 300)
+    print("P.O.I.", poi_size)
     sortedDistMatrix = generateDistanceMatrix(graph)
-    return graph, sortedDistMatrix, graph.get_depot()
+    return graph, sortedDistMatrix
     #Output formatting
     """
     print("Input:")

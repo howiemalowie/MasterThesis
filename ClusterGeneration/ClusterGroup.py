@@ -8,14 +8,14 @@ class ClusterGroup(object):
     OG_matrix: distance matrix containing distance data on all individual elements
     cluster_matrix: distance matrix containing distance data between all clusters
     """
-    def __init__(self, matrix, cluster_limit, cluster_list=None):
+    def __init__(self, matrix, cluster_limit, cluster_list=None, PQ=None):
         if cluster_list is None:
             cluster_list = dict()
 
         self.__cluster_list = cluster_list
         self.__matrix = matrix
         self.__cluster_limit = cluster_limit
-        self.__priority_queue = self.calc_average_cluster_matrix()
+        self.__priority_queue = PQ
 
     """
     Returns the dictionary object containing the clusters in the group
@@ -60,20 +60,6 @@ class ClusterGroup(object):
     """
     def get_priority_queue(self):
         return self.__priority_queue
-
-    def calc_average_cluster_matrix(self):
-        PQ = list()
-        clusters = self.get_all_clusters()
-        limit = self.get_cluster_limit()
-        matrix = self.get_matrix()
-        for (c1ID, c1) in clusters.items():
-            for (c2ID, c2) in clusters.items():
-                if c1ID != c2ID and c1.get_cluster_size() + c2.get_cluster_size() <= limit:
-                    res = complete_linkage_clustering(c1, c2, matrix)
-                    PQ.append((res, c1ID, c2ID))
-
-        heapq.heapify(PQ)
-        return PQ
 
     def __str__(self):
         res = "Clusters:"

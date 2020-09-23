@@ -1,6 +1,6 @@
 import math
 import heapq
-import random
+from numpy import random
 from ClusterGeneration.Cluster import Cluster
 from ClusterGeneration.ClusterGroup import ClusterGroup
 
@@ -13,9 +13,9 @@ def plusplus(link_mat, centroidLookUp, k, depot):
 
     # First centroid
     idx = random.randint(0, len(lst)-1)
-    clusters[str(0)] = Cluster(Cluster(str(0), [depot, lst[idx]], depot, lst[idx]))
+    clusters[str(0)] = Cluster(str(0), [depot, lst[idx]], depot, lst[idx])
     centroidLookUp[lst[idx]] = True
-    centroids.append(idx)
+    centroids.append(lst[idx])
 
     # Calculate probability
     D = [min(link_mat[x][y] for y in centroids) for x in lst]
@@ -23,15 +23,16 @@ def plusplus(link_mat, centroidLookUp, k, depot):
     P = [x / s for x in D]
     # Subsequent centroids
     for i in range(1, k):
-        idx = random.choice(range(0, len(lst)-1), P)
-        clusters[str(i)] = Cluster(Cluster(str(i), [depot, lst[idx]], depot, lst[idx]))
+        x = list(range(len(P)))
+        [idx] = random.choice(x, 1, P)
+        clusters[str(i)] = Cluster(str(i), [depot, lst[idx]], depot, lst[idx])
         centroidLookUp[lst[idx]] = True
-        centroids.append(idx)
+        centroids.append(lst[idx])
 
         # Update probabilities
         D = [min(link_mat[x][y] for y in centroids) for x in lst]
         s = sum(D)
-        P = [x / s for x in centroids]
+        P = [x / s for x in D]
 
     return clusters
 
@@ -90,6 +91,8 @@ def kmeans(link_mat, coord_dict, depot, K, lmt, init):
                 centroid = clusters[c_ID].get_centroid()
                 dist = link_mat[key][centroid] + link_mat[centroid][key] / 2
                 heapq.heappush(distances, (dist, c_ID))
+                distances.append((dist, c_ID))
+            heapq.heapify(distances)
 
             while True:
                 (_, closest_cluster_id) = heapq.heappop(distances)

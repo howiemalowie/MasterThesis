@@ -67,7 +67,7 @@ class Cluster(object):
         res += "\nDepot: " + str(self.get_depot())
         res += "\nCentroid: " + str(self.get_centroid())
         res += "\nTour: "
-        for k in self.get_solution()[1]:
-            res += str(k) + " "
+        #for k in self.get_solution()[1]:
+        #    res += str(k) + " "
         res += "\n"
         return res

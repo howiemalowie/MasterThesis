@@ -37,11 +37,11 @@ def solve_all_clusters(clusterGroup, roots, depot):
     for r in roots:
         linkMat = extract_linkage_matrix(r, matrix)
         if len(linkMat) > 15:
-            print("solving using 2-opt")
+            #print("solving using 2-opt")
             init_tour = nearest_neighbors(linkMat, depot)
             res, tour = two_opt(linkMat, init_tour)
         else:
-            print("solving using Held-Karp")
+            #print("solving using Held-Karp")
             res, tour = held_karp(linkMat)
         r.set_solution([res, tour])
 
