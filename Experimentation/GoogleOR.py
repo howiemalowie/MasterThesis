@@ -24,7 +24,7 @@ def create_data_model(link_mat, tour_limit, depot):
         cnt += 1
     for i in link_mat.keys():
         for j in link_mat[i].keys():
-            matrix[index[i]][index[j]] = int(link_mat[i][j]*1000000)
+            matrix[index[i]][index[j]] = int(link_mat[i][j])
     data['distance_matrix'] = matrix
     data['num_vehicles'] = math.ceil(n/tour_limit)
     data['demands'] = [1 for x in range(n)]
@@ -52,13 +52,13 @@ def print_solution(data, manager, routing, solution, id):
                 previous_index, index, vehicle_id)
         plan_output += ' {0} Load({1})\n'.format(id[manager.IndexToNode(index)],
                                                  route_load)
-        plan_output += 'Distance of the route: {}m\n'.format(route_distance/1000000)
+        plan_output += 'Distance of the route: {}m\n'.format(route_distance)
         plan_output += 'Load of the route: {}\n'.format(route_load)
-        print(plan_output)
+        #print(plan_output)
         total_distance += route_distance
         total_load += route_load
-    print('Total distance of all routes: {}m'.format(total_distance/1000000))
-    print('Total load of all routes: {}'.format(total_load))
+    #print('Total distance of all routes: {}m'.format(total_distance/1000000))
+    #print('Total load of all routes: {}'.format(total_load))
     return total_distance
 
 
@@ -108,8 +108,8 @@ def OR(link_mat, tour_limit, depot):
     # Setting first solution heuristic.
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
     search_parameters.local_search_metaheuristic = (
-        routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH)
-    search_parameters.time_limit.seconds = 5
+        routing_enums_pb2.LocalSearchMetaheuristic.SIMULATED_ANNEALING)
+    search_parameters.time_limit.seconds = 3
     search_parameters.log_search = False
 
     # Solve the problem.

@@ -42,13 +42,10 @@ def find_new_centroid(cluster, coord_dict, mean_lon, mean_lat):
     min_dist = float("inf")
     new_centroid = ""
     for p in cluster.get_elements():
-        if p == cluster.get_depot():
+        if p == 'D':
             continue
-        else:
-            coord_key = ''.join(ch for ch in p if ch.isdigit())
-
-        lon = coord_dict[coord_key][0]
-        lat = coord_dict[coord_key][1]
+        lon = coord_dict[p][0]
+        lat = coord_dict[p][1]
         dist = euclid_dist(lon, lat, mean_lon, mean_lat)
         if dist < min_dist:
             new_centroid = p
@@ -79,8 +76,11 @@ def kmeans(link_mat, coord_dict, depot, K, lmt, init):
         clusters = plusplus(link_mat, centroidLookUp, K, depot)
 
     done = False
-    while not done:
+    MAX_IT = 20
+    cnt = 0
+    while not done and cnt < MAX_IT:
 
+        cnt += 1
         # Assign each point to cluster corresponding to the closest centroid that has not reached cluster size limit
         for key in link_mat.keys():
             if key == depot or centroidLookUp[key]:
@@ -89,11 +89,11 @@ def kmeans(link_mat, coord_dict, depot, K, lmt, init):
             distances = list()
             for c_ID in clusters.keys():
                 centroid = clusters[c_ID].get_centroid()
-                dist = link_mat[key][centroid] + link_mat[centroid][key] / 2
+                dist = (link_mat[key][centroid] + link_mat[centroid][key]) / 2
                 heapq.heappush(distances, (dist, c_ID))
                 distances.append((dist, c_ID))
             heapq.heapify(distances)
-
+            #print(len(distances))
             while True:
                 (_, closest_cluster_id) = heapq.heappop(distances)
                 if clusters[closest_cluster_id].get_cluster_size() < lmt:
@@ -125,7 +125,7 @@ def kmeans(link_mat, coord_dict, depot, K, lmt, init):
                 centroidLookUp[old_centroid] = False
                 centroidLookUp[new_centroid] = True
 
-        if not done:
+        if not done and cnt < MAX_IT:
             for c_key in clusters.keys():
                 centroid = clusters[c_key].get_centroid()
                 if centroid == depot:

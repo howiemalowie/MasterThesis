@@ -129,14 +129,15 @@ def scatter_plot(graph, distMatrix):
 
 
 def main_test():
-    node_file = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cnode"
-    edge_file = "C:/Users/havar/Documents/MasterThesis/GraphData/la.cedge"
+    node_file = "C:/Users/havar/Documents/MasterThesis/GraphData/mohlenpris.cnode"
+    edge_file = "C:/Users/havar/Documents/MasterThesis/GraphData/weighted_mohlenpris.cedge"
 
     graph = constructGraph(node_file, edge_file, directed=False)
     connectGraph(graph)
+    print(graph.edges())
     size = len(graph.vertices())
     print("Graph size", size)
-    poi_size = generatePOI(graph, 300)
+    poi_size = generatePOI(graph, 50)
     print("P.O.I.", poi_size)
     sortedDistMatrix = generateDistanceMatrix(graph)
     return graph, sortedDistMatrix
