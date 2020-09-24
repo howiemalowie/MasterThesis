@@ -8,7 +8,8 @@ def swap(POI1, POI2, tour):
 
 def get_path_dist(tour, linkMat):
     dist = 0
-    for i in range(0, len(tour)-1, 2):
+    m = len(tour)-1
+    for i in range(m):
         dist += linkMat[tour[i]][tour[i+1]]
     return dist
 

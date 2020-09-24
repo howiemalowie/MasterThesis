@@ -30,7 +30,7 @@ def held_karp(M):
         res.append((g[(bits, k)][0] + M[lookup[k]][lookup[0]], k))
     opt, parent = min(res)
 
-    path = []
+    path = [lookup[0]]
     for i in range(n - 1):
         path.append(lookup[parent])
         new_bits = bits & ~(1 << parent)
