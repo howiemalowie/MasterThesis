@@ -1,5 +1,7 @@
 import math
 import heapq
+import sys
+
 from numpy import random
 from ClusterGeneration.Cluster import Cluster
 from ClusterGeneration.ClusterGroup import ClusterGroup
@@ -24,7 +26,9 @@ def plusplus(link_mat, centroidLookUp, k, depot):
     # Subsequent centroids
     for i in range(1, k):
         x = list(range(len(P)))
-        [idx] = random.choice(x, 1, P)
+        idx = random.choice(x, p=P)
+        if centroidLookUp[lst[idx]]:
+            print("double centroid")
         clusters[str(i)] = Cluster(str(i), [depot, lst[idx]], depot, lst[idx])
         centroidLookUp[lst[idx]] = True
         centroids.append(lst[idx])
@@ -42,8 +46,6 @@ def find_new_centroid(cluster, coord_dict, mean_lon, mean_lat):
     min_dist = float("inf")
     new_centroid = ""
     for p in cluster.get_elements():
-        if p == 'D':
-            continue
         lon = coord_dict[p][0]
         lat = coord_dict[p][1]
         dist = euclid_dist(lon, lat, mean_lon, mean_lat)
@@ -90,19 +92,31 @@ def kmeans(link_mat, coord_dict, depot, K, lmt, init):
             for c_ID in clusters.keys():
                 centroid = clusters[c_ID].get_centroid()
                 dist = (link_mat[key][centroid] + link_mat[centroid][key]) / 2
-                heapq.heappush(distances, (dist, c_ID))
                 distances.append((dist, c_ID))
             heapq.heapify(distances)
-            #print(len(distances))
-            while True:
-                (_, closest_cluster_id) = heapq.heappop(distances)
-                if clusters[closest_cluster_id].get_cluster_size() < lmt:
-                    clusters[closest_cluster_id].add_element(key)
-                    break
+
+            try:
+                while True:
+                    (_, closest_cluster_id) = heapq.heappop(distances)
+                    if clusters[closest_cluster_id].get_cluster_size() < lmt:
+                        clusters[closest_cluster_id].add_element(key)
+                        break
+            except IndexError:
+                print("All P.O.I.", link_mat.keys())
+                print("amount of P.O.I.", len(link_mat.keys())-1)
+                print("missing P.O.I.", key)
+                print("K = ", K)
+                print("k = ", lmt)
+                for c in clusters.values():
+                    print(c)
+                    print(c.get_elements())
+                sys.exit()
 
         # Update centroids. If no centroids change, end
         done = True
         for c in clusters.values():
+            if c.get_cluster_size() == 0:
+                continue
             elements = c.get_elements()
             mean_lat = 0
             mean_lon = 0
