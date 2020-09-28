@@ -6,7 +6,7 @@ import string
 Inf = float("Inf")
 
 
-def Dijkstra(G, s):
+def POI_Dijkstra(G, s):
     d = G.get_depot()
     vertices = G.vertices()
     visited = dict.fromkeys(vertices, False)
@@ -40,6 +40,33 @@ def Dijkstra(G, s):
     return sortedDist
 
 
+def Dijkstra(G, s):
+    vertices = G.vertices()
+    visited = dict.fromkeys(vertices, False)
+    dist = dict.fromkeys(vertices, Inf)
+    sortedDist = dict()
+    # finalDist = dict.fromkeys([w for w in vertices if G.get_nodeweight(w) > 0 or w == d])
+    Q = [(0.0, s)]
+
+    while Q:
+        (length, node) = hq.heappop(Q)
+        visited[node] = True
+        dist[node] = length
+        # finalDist[node] = dist[node]
+        sortedDist[node] = dist[node]
+
+        neighbors = G.get_neighbors(node)
+        for n in neighbors:
+            if not visited[n]:
+                edge_weight = G.get_edgeweight(node, n)
+                if edge_weight != -1:
+                    if dist[n] > dist[node] + edge_weight:
+                        dist[n] = dist[node] + edge_weight
+                        hq.heappush(Q, (dist[n], n))
+
+    return sortedDist
+
+
 def generateDistanceMatrix(graph):
     vertices = graph.vertices()
     d = graph.get_depot()
@@ -48,11 +75,22 @@ def generateDistanceMatrix(graph):
     for v in vertices:
             wght = graph.get_nodeweight(v)
             if wght > 0 or v == d:
-                sortedDist = Dijkstra(graph, v)
+                sortedDist = POI_Dijkstra(graph, v)
                 sortedMatrix[v] = sortedDist
                 for i in range(1, wght):
                     new_ID = str(v) + get_name(i)
                     sortedMatrix[new_ID] = sortedDist
+
+    return sortedMatrix
+
+
+def generateFirstMatrix(graph):
+    vertices = graph.vertices()
+    sortedMatrix = dict()
+
+    for v in vertices:
+                sortedDist = Dijkstra(graph, v)
+                sortedMatrix[v] = sortedDist
 
     return sortedMatrix
 
