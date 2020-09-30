@@ -2,6 +2,7 @@ import math
 import heapq
 import sys
 
+import geopy.distance
 from numpy import random
 from ClusterGeneration.Cluster import Cluster
 from ClusterGeneration.ClusterGroup import ClusterGroup
@@ -57,7 +58,11 @@ def find_new_centroid(cluster, coord_dict, mean_lon, mean_lat):
 
 
 def euclid_dist(x1, y1, x2, y2):
-    return math.sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2))
+    lat = x1 % 90
+    lon = y1 % 90
+    lat0 = x2 % 90
+    lon0 = y2 % 90
+    return geopy.distance.distance((lat, lon), (lat0, lon0)).m
 
 
 def kmeans(link_mat, coord_dict, depot, K, lmt, init):
