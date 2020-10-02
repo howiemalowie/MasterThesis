@@ -1,5 +1,6 @@
 import math
 import xlsxwriter
+import sys
 from timeit import default_timer as timer
 
 from ClusterGeneration.Agglomerate import buildClusters, agglomerate
@@ -11,9 +12,35 @@ from TSP.TravelingSalesPerson import solve_all_clusters
 from Experimentation.GoogleOR import OR
 
 
+def verifySolution(clusters, matrix, t):
+    entities_count = 0
+    accounted = dict.fromkeys(matrix, False)
+    for c in clusters:
+        sz = c.get_cluster_size()
+        entities_count += sz
+        if sz > t:
+            return "Tour limit breached"
+
+        path = c.get_solution()[1]
+        if len(path[1:-1]) != sz:
+            print(c.get_elements())
+            print(path)
+            return "missing entities in tour"
+
+        for ent in c.get_elements():
+            if accounted[ent] and ent != c.get_depot():
+                return "duplicate entities"
+            else:
+                accounted[ent] = True
+
+    if not all(accounted.values()):
+        return "missing entities"
+
+    return None
+
 
 if __name__ == "__main__":
-    workbook = xlsxwriter.Workbook('Mohlenpris.xlsx')
+    workbook = xlsxwriter.Workbook('Los-Angeles-300.xlsx')
     worksheet = workbook.add_worksheet()
 
     worksheet.write('A1', "Problem instance")
@@ -25,11 +52,11 @@ if __name__ == "__main__":
     worksheet.write('G1', "Score (kilometers)")
 
     row = 1
-    for prob_i in range(2):
+    for prob_i in range(10):
         graph, matrix = main_test()
         d = graph.get_depot()
         graph_size = len(graph.vertices())
-        n = len(matrix[d])
+        n = len(matrix[d])-1
         tour_limit = [5, 10, 20]
         cost_func = ["CLINK", "K-SLINK", "K-CLINK"]
         inc_depot = [True, False]
@@ -46,8 +73,8 @@ if __name__ == "__main__":
             worksheet.write(row, 1, graph_size)
             worksheet.write(row, 2, n)
             worksheet.write(row, 3, k)
-            worksheet.write(row, 4, "Google OR, local search w/ sim_annealing, 3 sec")
-            worksheet.write(row, 5, (end - start)*1000 )
+            worksheet.write(row, 4, "Google OR, local search w/ sim_annealing, 5 sec")
+            worksheet.write(row, 5, (end - start)*1000)
             worksheet.write(row, 6, round(res/1000, 3))
             row += 1
 
@@ -80,7 +107,10 @@ if __name__ == "__main__":
             opt_cnt, hk_cnt = solve_all_clusters(greedyClusters, greedy_roots, d)
             end = timer()
             distance = 0
-
+            passed = verifySolution(greedy_roots, matrix, k)
+            if passed is not None:
+                print(passed)
+                sys.exit(1)
             if(opt_cnt == 0):
                 solved = "Held-Karp"
             elif(hk_cnt == 0):
@@ -121,6 +151,19 @@ if __name__ == "__main__":
 
                     opt_cnt, hk_cnt = solve_all_clusters(MAH_Clusters, roots, d)
                     end = timer()
+
+                    passed = verifySolution(roots, matrix, k)
+                    if passed is not None:
+                        print(passed)
+                        sys.exit(1)
+
+                    if (opt_cnt == 0):
+                        solved = "Held-Karp"
+                    elif (hk_cnt == 0):
+                        solved = "2-opt"
+                    else:
+                        solved = "Mixed"
+
                     if (opt_cnt == 0):
                         solved = "Held-Karp"
                     elif (hk_cnt == 0):
@@ -143,20 +186,19 @@ if __name__ == "__main__":
                     worksheet.write(row, 1, graph_size)
                     worksheet.write(row, 2, n)
                     worksheet.write(row, 3, k)
-                    worksheet.write(row, 4, solved + " Modified hierarchical clustering, cost function: " + depot_inclusive + c)
+                    worksheet.write(row, 4, solved + " MHC, cost function: " + depot_inclusive + c)
                     worksheet.write(row, 5, (end - start) * 1000)
                     worksheet.write(row, 6, round(distance / 1000, 3))
                     row += 1
             print("Best result from MAHC for k=", k)
             print(round(best_distance/1000, 3), "km")
         print()
-    workbook.close()
-    """
+
         #MKMC
         coord_dict = dict()
         for k in matrix.keys():
             if k == d:
-                continue
+                key = d
             else:
                 key = ''.join(ch for ch in k if ch.isdigit())
             coord_dict[k] = coord_mat[key]
@@ -174,9 +216,25 @@ if __name__ == "__main__":
                     for i in range(3):
                         start = timer()
                         MKMC = kmeans(matrix, coord_dict, d, K, k, init)
-                        MKMC_roots = MKMC.get_all_clusters().values()
+                        #print(MKMC)
+                        MKMC_roots = list()
+                        for cluster in MKMC.get_all_clusters().values():
+                            if cluster.get_cluster_size() > 0:
+                                MKMC_roots.append(cluster)
                         opt_cnt, hk_cnt = solve_all_clusters(MKMC, MKMC_roots, d)
                         end = timer()
+
+                        passed = verifySolution(MKMC_roots, matrix, k)
+                        if passed is not None:
+                            print(passed)
+                            sys.exit(1)
+                        if (opt_cnt == 0):
+                            solved = "Held-Karp"
+                        elif (hk_cnt == 0):
+                            solved = "2-opt"
+                        else:
+                            solved = "Mixed"
+
                         if (opt_cnt == 0):
                             solved = "Held-Karp"
                         elif (hk_cnt == 0):
@@ -188,8 +246,8 @@ if __name__ == "__main__":
                             sol = clus.get_solution()
                             distance += sol[0]
                             #print("trip", i, "|", "length:", round(sol[0], 3), sol[1])
-                        best_dist = min(distance, best_dist)
                         if distance < best_dist:
+                            best_dist = distance
                             best_solved = solved
                             best_time = (end - start) * 1000
                         best_distance = min(best_dist, best_distance)
@@ -199,11 +257,12 @@ if __name__ == "__main__":
                     worksheet.write(row, 1, graph_size)
                     worksheet.write(row, 2, n)
                     worksheet.write(row, 3, k)
-                    worksheet.write(row, 4, best_solved + " Modified K-means clustering, initiation: " + init +
+                    worksheet.write(row, 4, best_solved + " MKMC, initiation: " + init +
                                     ", centroids: " + str(K) + ", Cluster attempts: 3")
                     worksheet.write(row, 5, best_time)
                     worksheet.write(row, 6, round(best_dist / 1000, 3))
                     row += 1
             print("Best result from MKMC for k=", k)
-            print(round(best_distance/1000, 3), "km")"""
+            print(round(best_distance/1000, 3), "km")
 
+    workbook.close()

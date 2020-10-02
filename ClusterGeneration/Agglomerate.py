@@ -43,7 +43,12 @@ def merge_clusters(cluster1, cluster2):
 
 
 def compute_cost_func(c1, c2, link_mat, cf, include):
-    k = min(c1.get_cluster_size() // 3, c2.get_cluster_size() // 3)
+    a = c1.get_cluster_size()
+    b = c2.get_cluster_size()
+    if include:
+        a += 1
+        b += 1
+    k = min(c1.get_cluster_size() // 5, c2.get_cluster_size() // 5)
     if k <= 0:
         k = 1
     if cf == "CLINK":

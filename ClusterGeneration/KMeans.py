@@ -159,6 +159,8 @@ def kmeans(link_mat, coord_dict, depot, K, lmt, init):
                 done = False
                 c.set_centroid(new_centroid)
                 centroidLookUp[new_centroid] = True
+            else:
+                centroidLookUp[old_centroid] = True
 
         if not done and cnt < MAX_IT:
             for c_key in clusters.keys():
