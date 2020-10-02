@@ -24,6 +24,8 @@ def plusplus(link_mat, centroidLookUp, k, depot):
     D = [min(link_mat[x][y] for y in centroids) for x in lst]
     s = sum(D)
     P = [x / s for x in D]
+    whoops = False
+    cont = 0
     # Subsequent centroids
     for i in range(1, k):
         x = list(range(len(P)))
@@ -37,7 +39,20 @@ def plusplus(link_mat, centroidLookUp, k, depot):
         # Update probabilities
         D = [min(link_mat[x][y] for y in centroids) for x in lst]
         s = sum(D)
+        if s == 0:
+            whoops = True
+            cont = i+1
+            break
         P = [x / s for x in D]
+
+    if whoops:
+        for j in lst:
+            if not centroidLookUp[j]:
+                clusters[str(i)] = Cluster(str(cont), [depot, j], depot, j)
+                centroidLookUp[j] = True
+                cont = cont+1
+            if cont >= k:
+                break
 
     return clusters
 
@@ -88,37 +103,39 @@ def kmeans(link_mat, coord_dict, depot, K, lmt, init):
     while not done and cnt < MAX_IT:
 
         cnt += 1
+        distances = list()
         # Assign each point to cluster corresponding to the closest centroid that has not reached cluster size limit
         for key in link_mat.keys():
             if key == depot or centroidLookUp[key]:
                 continue
 
-            distances = list()
             for c_ID in clusters.keys():
                 centroid = clusters[c_ID].get_centroid()
                 dist = (link_mat[key][centroid] + link_mat[centroid][key]) / 2
-                distances.append((dist, c_ID))
-            heapq.heapify(distances)
+                distances.append((dist, c_ID, key))
+        heapq.heapify(distances)
 
-            try:
-                while True:
-                    (_, closest_cluster_id) = heapq.heappop(distances)
-                    if clusters[closest_cluster_id].get_cluster_size() < lmt:
-                        clusters[closest_cluster_id].add_element(key)
-                        break
-            except IndexError:
-                print("All P.O.I.", link_mat.keys())
-                print("amount of P.O.I.", len(link_mat.keys())-1)
-                print("missing P.O.I.", key)
-                print("K = ", K)
-                print("k = ", lmt)
-                for c in clusters.values():
-                    print(c)
-                    print(c.get_elements())
-                sys.exit()
+        try:
+            while distances:
+                (_, closest_cluster_id, key) = heapq.heappop(distances)
+                if clusters[closest_cluster_id].get_cluster_size() < lmt and not centroidLookUp[key]:
+                    clusters[closest_cluster_id].add_element(key)
+                    centroidLookUp[key] = True
+
+        except IndexError:
+            print("All P.O.I.", link_mat.keys())
+            print("amount of P.O.I.", len(link_mat.keys())-1)
+            #print("missing P.O.I.", key)
+            print("K = ", K)
+            print("k = ", lmt)
+            for c in clusters.values():
+                print(c)
+                print(c.get_elements())
+            sys.exit(1)
 
         # Update centroids. If no centroids change, end
         done = True
+        centroidLookUp = dict.fromkeys(link_mat.keys(), False)
         for c in clusters.values():
             if c.get_cluster_size() == 0:
                 continue
@@ -141,7 +158,6 @@ def kmeans(link_mat, coord_dict, depot, K, lmt, init):
             if new_centroid != old_centroid:
                 done = False
                 c.set_centroid(new_centroid)
-                centroidLookUp[old_centroid] = False
                 centroidLookUp[new_centroid] = True
 
         if not done and cnt < MAX_IT:
